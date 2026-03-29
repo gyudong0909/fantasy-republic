@@ -8,134 +8,217 @@
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; overflow: hidden; background: #000; color: #e0e0e0; }
-    body { font-family: 'Noto Sans KR', sans-serif; cursor: none; }
+    body { font-family: 'Noto Sans KR', sans-serif; }
 
-    .screen {
-      width: 100vw; height: 100vh;
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      padding: 60px 80px;
-      position: relative;
-    }
+    .view { display: none; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
+    .view.active { display: flex; }
 
-    /* 라운드 표시 */
-    .round-badge {
-      position: absolute; top: 32px; left: 40px;
-      font-size: 13px; font-weight: 900; color: #f0c040;
-      background: rgba(240,192,64,0.08); padding: 6px 16px;
-      border-radius: 20px; border: 1px solid rgba(240,192,64,0.2);
-    }
+    /* === WAITING === */
+    .v-waiting { flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+    .v-waiting h1 { font-size: 48px; font-weight: 900; background: linear-gradient(135deg,#f0c040,#ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .v-waiting p { color: #333; font-size: 14px; }
 
-    /* 메인 텍스트 */
-    .main-text {
-      font-size: 28px; font-weight: 400; line-height: 2;
-      text-align: center; max-width: 900px;
-      opacity: 0; transform: translateY(20px);
-      animation: fadeIn 0.6s forwards;
-    }
-    @keyframes fadeIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
+    /* === SCRIPT === */
+    .v-script { flex-direction: column; justify-content: center; align-items: center; padding: 60px 80px; position: relative; }
+    .v-script .round-badge { position: absolute; top: 32px; left: 40px; font-size: 13px; font-weight: 900; color: #f0c040; background: rgba(240,192,64,0.08); padding: 6px 16px; border-radius: 20px; }
+    .v-script .speaker-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; opacity:0; animation: fadeIn 0.4s 0.1s forwards; }
+    .v-script .main-text { font-size: 28px; font-weight: 400; line-height: 2; text-align: center; max-width: 900px; opacity:0; transform: translateY(20px); animation: fadeIn 0.6s forwards; }
+    .v-script .main-text em { font-style: normal; color: #f0c040; font-weight: 700; }
+    .v-script .main-text .q { color: #888; font-style: italic; }
+    .v-script .main-text .rub { color: #444; font-size: 18px; }
+    .speaker-label.narr { color: #f0c040; } .speaker-label.sys { color: #6ab0ff; } .speaker-label.dir { color: #555; }
+    .speaker-label.junhyuk { color: #6ab0ff; } .speaker-label.sangrin { color: #6aff9a; } .speaker-label.yeonwoo { color: #d06aff; }
+    .speaker-label.vip { color: #ffd700; } .speaker-label.squid { color: #ff2d78; }
+    .progress-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: linear-gradient(90deg,#f0c040,#ff6b6b); transition: width 0.5s; }
+    @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 
-    .main-text em {
-      font-style: normal; color: #f0c040; font-weight: 700;
-    }
-    .main-text .q {
-      color: #888; font-style: italic;
-    }
-    .main-text .rub {
-      color: #444; font-size: 18px;
-    }
-    .main-text .b { display: block; height: 16px; }
+    /* === TIMER === */
+    .v-timer { flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+    .v-timer .timer-label { font-size: 18px; color: #555; font-weight: 700; }
+    .v-timer .timer-num { font-size: 160px; font-weight: 900; font-variant-numeric: tabular-nums; color: #f0c040; transition: color 0.3s; }
+    .v-timer .timer-num.urgent { color: #ff4444; }
 
-    /* 스피커 라벨 */
-    .speaker-label {
-      font-size: 12px; font-weight: 700; letter-spacing: 1px;
-      text-transform: uppercase; margin-bottom: 20px;
-      opacity: 0; animation: fadeIn 0.4s 0.1s forwards;
-    }
-    .speaker-label.narr { color: #f0c040; }
-    .speaker-label.sys { color: #6ab0ff; }
-    .speaker-label.dir { color: #555; }
-    .speaker-label.junhyuk { color: #6ab0ff; }
-    .speaker-label.sangrin { color: #6aff9a; }
-    .speaker-label.yeonwoo { color: #d06aff; }
-    .speaker-label.vip { color: #ffd700; }
-    .speaker-label.squid { color: #ff2d78; }
+    /* === SCOREBOARD === */
+    .v-scoreboard { flex-direction: column; padding: 60px 80px; overflow-y: auto; }
+    .v-scoreboard h2 { font-size: 28px; font-weight: 900; color: #f0c040; margin-bottom: 24px; }
+    .sb-row { display: flex; align-items: center; gap: 16px; padding: 14px 20px; margin: 4px 0; background: #0e0e18; border-radius: 10px; transition: all 0.3s; }
+    .sb-row.top1 { border: 1px solid #ffd700; background: rgba(255,215,0,0.05); }
+    .sb-row.negative { border: 1px solid #ff2d78; background: rgba(255,45,120,0.05); }
+    .sb-rank { font-size: 24px; font-weight: 900; width: 40px; text-align: center; color: #f0c040; }
+    .sb-name { font-size: 20px; font-weight: 700; flex: 1; }
+    .sb-bar-wrap { flex: 2; height: 8px; background: #1a1a2e; border-radius: 4px; overflow: hidden; }
+    .sb-bar-fill { height: 100%; border-radius: 4px; transition: width 1s; }
+    .sb-gold { font-size: 18px; font-weight: 900; min-width: 100px; text-align: right; }
+    .sb-party { font-size: 12px; color: #555; min-width: 60px; }
 
-    /* 후보 카드 특별 스타일 */
-    .main-text.candidate { text-align: left; }
+    /* === STOCKS === */
+    .v-stocks { flex-direction: column; padding: 60px 80px; }
+    .v-stocks h2 { font-size: 28px; font-weight: 900; color: #f0c040; margin-bottom: 24px; }
+    .stock-row { display: flex; align-items: center; gap: 16px; padding: 16px 20px; margin: 6px 0; background: #0e0e18; border-radius: 10px; }
+    .stock-icon { font-size: 28px; width: 40px; text-align: center; }
+    .stock-name { font-size: 18px; font-weight: 700; width: 140px; }
+    .stock-price { font-size: 24px; font-weight: 900; width: 100px; text-align: right; }
+    .stock-change { font-size: 16px; font-weight: 700; width: 80px; text-align: right; }
+    .stock-change.up { color: #ff4444; }
+    .stock-change.down { color: #4488ff; }
+    .stock-change.flat { color: #666; }
+    .stock-history { flex: 1; display: flex; align-items: flex-end; gap: 2px; height: 40px; }
+    .stock-history .bar { width: 8px; border-radius: 2px 2px 0 0; background: #333; transition: height 0.5s; }
 
-    /* 하단 진행 바 */
-    .progress-bar {
-      position: absolute; bottom: 0; left: 0; height: 3px;
-      background: linear-gradient(90deg, #f0c040, #ff6b6b);
-      transition: width 0.5s;
-    }
+    /* === VOTE === */
+    .v-vote { flex-direction: column; justify-content: center; align-items: center; padding: 60px 80px; gap: 24px; }
+    .v-vote h2 { font-size: 28px; font-weight: 900; color: #f0c040; }
+    .vote-cand { width: 100%; max-width: 700px; }
+    .vote-row { display: flex; align-items: center; gap: 16px; margin: 12px 0; }
+    .vote-name { font-size: 18px; font-weight: 700; width: 120px; }
+    .vote-bar-outer { flex: 1; height: 32px; background: #1a1a2e; border-radius: 8px; overflow: hidden; position: relative; }
+    .vote-bar-inner { height: 100%; border-radius: 8px; transition: width 1s; }
+    .vote-count { font-size: 18px; font-weight: 900; width: 60px; text-align: right; }
+    .vote-pct { font-size: 14px; color: #888; width: 50px; text-align: right; }
 
-    /* 대기 화면 */
-    .waiting {
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      height: 100vh; gap: 16px;
-    }
-    .waiting h1 {
-      font-size: 48px; font-weight: 900;
-      background: linear-gradient(135deg, #f0c040, #ff6b6b);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .waiting p { color: #333; font-size: 14px; }
+    /* === HORSE === */
+    .v-horse { flex-direction: column; justify-content: center; align-items: center; padding: 60px; gap: 20px; }
+    .v-horse h2 { font-size: 28px; font-weight: 900; color: #f0c040; }
+    .horse-result { font-size: 80px; font-weight: 900; }
+    .horse-detail { font-size: 20px; color: #aaa; }
   </style>
 </head>
 <body>
 
-<div class="waiting" id="waitingScreen">
+<div class="view v-waiting active" id="vWaiting">
   <h1>판타지 공화국</h1>
   <p>컨트롤러에서 시작하면 화면이 표시됩니다</p>
 </div>
 
-<div class="screen" id="presentScreen" style="display:none;">
-  <div class="round-badge" id="roundBadge"></div>
-  <div class="speaker-label" id="speakerLabel"></div>
-  <div class="main-text" id="mainText"></div>
-  <div class="progress-bar" id="progressBar"></div>
+<div class="view v-script" id="vScript">
+  <div class="round-badge" id="sBadge"></div>
+  <div class="speaker-label" id="sSpeaker"></div>
+  <div class="main-text" id="sText"></div>
+  <div class="progress-bar" id="sProgress"></div>
+</div>
+
+<div class="view v-timer" id="vTimer">
+  <div class="timer-label">자유 시간</div>
+  <div class="timer-num" id="tNum">5:00</div>
+</div>
+
+<div class="view v-scoreboard" id="vScoreboard">
+  <h2>순위표</h2>
+  <div id="sbList"></div>
+</div>
+
+<div class="view v-stocks" id="vStocks">
+  <h2>주식 시세</h2>
+  <div id="stList"></div>
+</div>
+
+<div class="view v-vote" id="vVote">
+  <h2 id="voteTitle">대통령 선거</h2>
+  <div class="vote-cand" id="voteList"></div>
+</div>
+
+<div class="view v-horse" id="vHorse">
+  <h2>경마 결과</h2>
+  <div class="horse-result" id="horseResult"></div>
+  <div class="horse-detail" id="horseDetail"></div>
 </div>
 
 <script>
 const ch = new BroadcastChannel('fantasy-republic');
 
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
 ch.onmessage = (e) => {
   const { type, data } = e.data;
 
+  if (type === 'black') { showView('vWaiting'); return; }
+
   if (type === 'show') {
-    document.getElementById('waitingScreen').style.display = 'none';
-    const screen = document.getElementById('presentScreen');
-    screen.style.display = 'flex';
-
-    document.getElementById('roundBadge').textContent = data.round || '';
-
-    const sl = document.getElementById('speakerLabel');
+    showView('vScript');
+    document.getElementById('sBadge').textContent = data.round || '';
+    const sl = document.getElementById('sSpeaker');
     sl.textContent = data.speaker || '';
     sl.className = 'speaker-label ' + (data.speakerClass || '');
-
-    const mt = document.getElementById('mainText');
+    const mt = document.getElementById('sText');
     mt.innerHTML = data.html || '';
-    mt.className = 'main-text' + (data.isCandidate ? ' candidate' : '');
-    // re-trigger animation
-    mt.style.animation = 'none';
-    mt.offsetHeight;
-    mt.style.animation = '';
-
-    const pb = document.getElementById('progressBar');
-    pb.style.width = data.progress + '%';
+    mt.style.animation = 'none'; mt.offsetHeight; mt.style.animation = '';
+    document.getElementById('sProgress').style.width = data.progress + '%';
   }
 
-  if (type === 'black') {
-    document.getElementById('waitingScreen').style.display = 'flex';
-    document.getElementById('presentScreen').style.display = 'none';
+  if (type === 'timer') {
+    showView('vTimer');
+    const m = Math.floor(data.seconds / 60);
+    const s = data.seconds % 60;
+    const el = document.getElementById('tNum');
+    el.textContent = m + ':' + String(s).padStart(2, '0');
+    el.classList.toggle('urgent', data.seconds <= 10);
+  }
+
+  if (type === 'scoreboard') {
+    showView('vScoreboard');
+    const list = document.getElementById('sbList');
+    const maxNW = Math.max(...data.players.map(p => p.netWorth), 1);
+    list.innerHTML = data.players.map((p, i) => {
+      const pct = Math.max(0, p.netWorth / maxNW * 100);
+      const cls = i === 0 ? 'sb-row top1' : p.netWorth < 0 ? 'sb-row negative' : 'sb-row';
+      const color = p.netWorth < 0 ? '#ff2d78' : i === 0 ? '#ffd700' : '#f0c040';
+      return `<div class="${cls}">
+        <div class="sb-rank">${i+1}</div>
+        <div class="sb-name">${p.name}</div>
+        <div class="sb-bar-wrap"><div class="sb-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+        <div class="sb-gold" style="color:${color}">${p.netWorth.toLocaleString()}G</div>
+        <div class="sb-party">${p.party || ''}</div>
+      </div>`;
+    }).join('');
+  }
+
+  if (type === 'stocks') {
+    showView('vStocks');
+    const icons = {'철벽건설':'🏗️','레드포지':'🔫','네오텍':'💻','볼트에너지':'⚡','미라주엔터':'🎪','블랙마켓':'🕳️'};
+    const list = document.getElementById('stList');
+    list.innerHTML = data.stocks.map(s => {
+      const prev = s.history.length > 1 ? s.history[s.history.length - 2] : s.price;
+      const diff = s.price - prev;
+      const cls = diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat';
+      const sign = diff > 0 ? '+' : '';
+      const maxH = Math.max(...s.history, 1);
+      const bars = s.history.map(h => `<div class="bar" style="height:${h/maxH*100}%;background:${h>=prev?'#f0c040':'#555'};"></div>`).join('');
+      return `<div class="stock-row">
+        <div class="stock-icon">${icons[s.name]||''}</div>
+        <div class="stock-name">${s.name}</div>
+        <div class="stock-history">${bars}</div>
+        <div class="stock-change ${cls}">${sign}${diff}G</div>
+        <div class="stock-price" style="color:${cls==='up'?'#ff4444':cls==='down'?'#4488ff':'#aaa'}">${s.price}G</div>
+      </div>`;
+    }).join('');
+  }
+
+  if (type === 'vote') {
+    showView('vVote');
+    document.getElementById('voteTitle').textContent = data.title || '투표';
+    const total = Math.max(data.candidates.reduce((a,c) => a + c.count, 0), 1);
+    const colors = {'박준혁':'#6ab0ff','정상린':'#6aff9a','장연우':'#d06aff','유지':'#6aff9a','탄핵':'#ff4444','기권':'#555'};
+    document.getElementById('voteList').innerHTML = data.candidates.map(c => {
+      const pct = (c.count / total * 100).toFixed(0);
+      return `<div class="vote-row">
+        <div class="vote-name">${c.name}</div>
+        <div class="vote-bar-outer"><div class="vote-bar-inner" style="width:${pct}%;background:${colors[c.name]||'#f0c040'}"></div></div>
+        <div class="vote-count">${c.count}</div>
+        <div class="vote-pct">${pct}%</div>
+      </div>`;
+    }).join('');
+  }
+
+  if (type === 'horse') {
+    showView('vHorse');
+    const mult = [0, 2, 3, 5, 10];
+    document.getElementById('horseResult').textContent = '🐎 ' + data.winner + '번 말!';
+    document.getElementById('horseDetail').textContent = '배당 ×' + mult[data.winner];
   }
 };
 </script>
-
 </body>
 </html>
