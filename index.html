@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>판타지 공화국 — 프로젝트 시각화</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,10,15,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #1a1a2e;
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 24px;
+      overflow-x: auto;
+    }
+    nav a {
+      color: #888; text-decoration: none; font-size: 13px;
+      padding: 6px 14px; border-radius: 20px;
+      white-space: nowrap; transition: all 0.3s;
+    }
+    nav a:hover, nav a.active { color: #fff; background: #1a1a2e; }
+    nav .logo {
+      font-weight: 900; font-size: 15px; color: #f0c040;
+      margin-right: 16px; white-space: nowrap;
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      min-height: 100vh; padding: 100px 24px 60px;
+      max-width: 1200px; margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 42px; font-weight: 900; margin-bottom: 8px;
+      background: linear-gradient(135deg, #f0c040, #ff6b6b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    h2 {
+      font-size: 28px; font-weight: 700; margin: 48px 0 20px;
+      color: #f0c040;
+    }
+    .subtitle { color: #888; font-size: 16px; margin-bottom: 48px; }
+
+    /* ── FLOW CHART ── */
+    .flow {
+      display: flex; align-items: stretch; gap: 0;
+      overflow-x: auto; padding: 20px 0;
+    }
+    .flow-item {
+      flex-shrink: 0; width: 200px;
+      background: #12121c; border: 1px solid #1e1e30;
+      border-radius: 16px; padding: 24px 18px;
+      text-align: center; position: relative;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .flow-item:hover { transform: translateY(-4px); border-color: #f0c040; }
+    .flow-arrow {
+      flex-shrink: 0; display: flex; align-items: center;
+      font-size: 24px; color: #333; padding: 0 4px;
+    }
+    .flow-round {
+      font-size: 11px; font-weight: 700; color: #f0c040;
+      background: rgba(240,192,64,0.1); border-radius: 20px;
+      padding: 3px 10px; display: inline-block; margin-bottom: 10px;
+    }
+    .flow-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .flow-desc { font-size: 12px; color: #888; line-height: 1.5; }
+
+    /* ── SCREEN PREVIEWS ── */
+    .screens {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+    }
+    .screen-card {
+      background: #12121c; border: 1px solid #1e1e30;
+      border-radius: 16px; overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .screen-card:hover { transform: translateY(-4px); border-color: #f0c040; }
+    .screen-preview {
+      height: 220px; position: relative; overflow: hidden;
+    }
+    .screen-info { padding: 20px; }
+    .screen-info h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .screen-info p { font-size: 13px; color: #888; line-height: 1.6; }
+    .screen-tag {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px; margin-top: 10px;
+    }
+
+    /* ── PREVIEW MOCK UPS ── */
+    .mock-prologue {
+      background: linear-gradient(180deg, #0a0a0f 0%, #1a0a0a 100%);
+      display: flex; flex-direction: column; justify-content: center;
+      align-items: center; padding: 30px;
+    }
+    .mock-prologue .typing {
+      font-size: 15px; color: #ccc; text-align: center; line-height: 2;
+    }
+    .mock-prologue .typing span {
+      display: block; opacity: 0;
+      animation: fadeUp 0.6s forwards;
+    }
+    .mock-prologue .typing span:nth-child(1) { animation-delay: 0.2s; }
+    .mock-prologue .typing span:nth-child(2) { animation-delay: 0.8s; }
+    .mock-prologue .typing span:nth-child(3) { animation-delay: 1.4s; color: #f0c040; font-weight: 700; font-size: 20px; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .mock-candidates {
+      background: #0e0e18; display: flex; justify-content: center;
+      align-items: center; gap: 12px; padding: 20px;
+    }
+    .mini-card {
+      width: 90px; height: 160px; border-radius: 12px;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 6px; font-size: 11px; font-weight: 700;
+      transition: transform 0.3s;
+    }
+    .mini-card:hover { transform: scale(1.05); }
+    .mini-card .icon { font-size: 32px; }
+    .mini-card.junhyuk { background: linear-gradient(135deg, #1a2a4a, #2a3a5a); color: #6ab0ff; border: 1px solid #2a4a7a; }
+    .mini-card.sangrin { background: linear-gradient(135deg, #1a3a2a, #2a4a3a); color: #6aff9a; border: 1px solid #2a6a4a; }
+    .mini-card.yeonwoo { background: linear-gradient(135deg, #2a1a2a, #3a1a3a); color: #d06aff; border: 1px solid #4a2a5a; }
+
+    .mock-vote {
+      background: #0e0e18; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px; padding: 20px;
+    }
+    .vote-bar-wrap { width: 80%; }
+    .vote-bar-label { font-size: 11px; color: #888; margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .vote-bar { height: 20px; border-radius: 10px; background: #1a1a2e; overflow: hidden; }
+    .vote-fill { height: 100%; border-radius: 10px; transition: width 1s; }
+
+    .mock-stock {
+      background: #0e0e18; padding: 20px; display: flex;
+      align-items: flex-end; justify-content: center; gap: 3px;
+    }
+    .stock-bar {
+      width: 8px; border-radius: 4px 4px 0 0;
+      transition: height 0.5s;
+    }
+
+    .mock-bank {
+      background: #0e0e18; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 20px; gap: 12px;
+    }
+    .bank-row {
+      display: flex; align-items: center; gap: 12px;
+      background: #1a1a2e; padding: 10px 20px; border-radius: 12px;
+      font-size: 13px; width: 80%;
+    }
+    .bank-row .emoji { font-size: 20px; }
+    .bank-row .label { color: #888; flex: 1; }
+    .bank-row .value { font-weight: 700; color: #f0c040; }
+
+    .mock-dashboard {
+      background: #0e0e18; padding: 16px; display: flex;
+      flex-direction: column; gap: 8px; justify-content: center;
+    }
+    .dash-row {
+      display: flex; align-items: center; gap: 10px;
+      background: #1a1a2e; padding: 8px 14px; border-radius: 8px; font-size: 12px;
+    }
+    .dash-row .rank { color: #f0c040; font-weight: 900; width: 20px; }
+    .dash-row .name { flex: 1; }
+    .dash-row .gold { color: #f0c040; font-weight: 700; }
+    .dash-row .debt { color: #ff6b6b; font-size: 11px; }
+    .dash-bar { flex: 2; height: 6px; background: #0e0e18; border-radius: 3px; overflow: hidden; }
+    .dash-bar-fill { height: 100%; border-radius: 3px; }
+
+    .mock-gambling {
+      background: #0e0e18; display: flex; justify-content: center;
+      align-items: center; gap: 16px; padding: 20px;
+    }
+    .gamble-item {
+      width: 80px; height: 100px; border-radius: 12px;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 6px; font-size: 11px;
+      background: #1a1a2e; border: 1px solid #2a2a3e;
+    }
+    .gamble-item .icon { font-size: 28px; }
+
+    /* ── PLAYER STRUCTURE ── */
+    .player-struct {
+      background: #12121c; border: 1px solid #1e1e30;
+      border-radius: 16px; padding: 32px; max-width: 600px;
+    }
+    .struct-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 12px 0; border-bottom: 1px solid #1a1a2e;
+    }
+    .struct-row:last-child { border-bottom: none; }
+    .struct-icon { font-size: 24px; width: 40px; text-align: center; }
+    .struct-label { font-weight: 700; width: 100px; }
+    .struct-value { color: #888; font-size: 14px; flex: 1; }
+    .struct-example { color: #f0c040; font-size: 14px; font-weight: 700; }
+
+    /* ── SYSTEM MAP ── */
+    .sys-map {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    @media (max-width: 768px) { .sys-map { grid-template-columns: 1fr; } }
+    .sys-node {
+      background: #12121c; border: 1px solid #1e1e30;
+      border-radius: 16px; padding: 24px; text-align: center;
+      transition: border-color 0.3s;
+    }
+    .sys-node:hover { border-color: #f0c040; }
+    .sys-node .icon { font-size: 36px; margin-bottom: 10px; }
+    .sys-node h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .sys-node p { font-size: 12px; color: #888; line-height: 1.6; }
+    .sys-arrows {
+      grid-column: 1 / -1; text-align: center;
+      color: #333; font-size: 14px; padding: 8px 0;
+    }
+    .sys-arrows span { color: #f0c040; }
+
+    /* ── TECH STACK ── */
+    .tech-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+    .tech-item {
+      background: #12121c; border: 1px solid #1e1e30;
+      border-radius: 12px; padding: 16px; text-align: center;
+    }
+    .tech-item .name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .tech-item .role { font-size: 11px; color: #888; }
+
+    /* ── PIPELINE ── */
+    .pipeline {
+      position: relative;
+      padding-left: 30px;
+    }
+    .pipeline::before {
+      content: ''; position: absolute; left: 10px; top: 0; bottom: 0;
+      width: 2px; background: linear-gradient(180deg, #f0c040, #ff6b6b, #6a6aff);
+    }
+    .pipe-phase {
+      position: relative; margin-bottom: 32px;
+      padding-left: 20px;
+    }
+    .pipe-phase::before {
+      content: ''; position: absolute; left: -24px; top: 6px;
+      width: 12px; height: 12px; border-radius: 50%;
+      border: 2px solid #f0c040; background: #0a0a0f;
+    }
+    .pipe-phase.done::before { background: #f0c040; }
+    .pipe-num {
+      font-size: 11px; font-weight: 700; color: #f0c040;
+      margin-bottom: 4px;
+    }
+    .pipe-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .pipe-desc { font-size: 13px; color: #888; }
+    .pipe-output {
+      margin-top: 6px; font-size: 12px; color: #555;
+      font-style: italic;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 60px 24px;
+      color: #333; font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">판타지 공화국</span>
+  <a href="#overview">전체 흐름</a>
+  <a href="#screens">화면 미리보기</a>
+  <a href="#player">플레이어 구조</a>
+  <a href="#system">시스템 연결</a>
+  <a href="#pipeline">작업 순서</a>
+</nav>
+
+<!-- ═══════════ 전체 흐름 ═══════════ -->
+<section id="overview">
+  <h1>판타지 공화국</h1>
+  <p class="subtitle">멸망 이후, 새 국가를 세우는 경제 × 정치 게임</p>
+
+  <h2>게임 전체 흐름</h2>
+  <div class="flow">
+    <div class="flow-item">
+      <span class="flow-round">0라운드</span>
+      <div class="flow-title">프롤로그</div>
+      <div class="flow-desc">세계관 소개<br>500골드 지급</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">
+      <span class="flow-round">1라운드</span>
+      <div class="flow-title">정치</div>
+      <div class="flow-desc">당 가입<br>후보 공개<br>대통령 투표</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">
+      <span class="flow-round">2라운드</span>
+      <div class="flow-title">주식 시작</div>
+      <div class="flow-desc">회사 투자<br>정보 교환<br>정책 효과 적용</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">
+      <span class="flow-round">3라운드</span>
+      <div class="flow-title">경마 추가</div>
+      <div class="flow-desc">단기 베팅<br>빠른 수익</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">
+      <span class="flow-round">4라운드</span>
+      <div class="flow-title">도박 오픈</div>
+      <div class="flow-desc">고위험 고수익<br>역전 기회</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">
+      <span class="flow-round">5라운드</span>
+      <div class="flow-title">복권 + 혼돈</div>
+      <div class="flow-desc">운 기반 역전<br>정치 격변</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item" style="border-color: #f0c040;">
+      <span class="flow-round" style="background: rgba(255,107,107,0.15); color: #ff6b6b;">최종</span>
+      <div class="flow-title">결산</div>
+      <div class="flow-desc">순자산 1위 = 승리</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 화면 미리보기 ═══════════ -->
+<section id="screens">
+  <h2>화면별 미리보기</h2>
+  <p class="subtitle">실제로 만들어질 화면들의 컨셉</p>
+
+  <div class="screens">
+
+    <!-- 프롤로그 -->
+    <div class="screen-card">
+      <div class="screen-preview mock-prologue">
+        <div class="typing">
+          <span>세계는… 멸망했습니다.</span>
+          <span>하지만 인류는 멸망하지 않았습니다.</span>
+          <span>판타지 공화국</span>
+        </div>
+      </div>
+      <div class="screen-info">
+        <h3>프롤로그</h3>
+        <p>대본 텍스트가 한 줄씩 타이핑되면서 등장. 배경 이미지 전환 + BGM과 함께 시네마틱 연출.</p>
+        <span class="screen-tag" style="background: rgba(240,192,64,0.15); color: #f0c040;">0라운드</span>
+      </div>
+    </div>
+
+    <!-- 후보 공개 -->
+    <div class="screen-card">
+      <div class="screen-preview mock-candidates">
+        <div class="mini-card junhyuk">
+          <div class="icon">⚔️</div>
+          박준혁
+          <div style="font-size:9px; font-weight:400; color:#6ab0ff99;">강철방위당</div>
+        </div>
+        <div class="mini-card sangrin">
+          <div class="icon">🧪</div>
+          정상린
+          <div style="font-size:9px; font-weight:400; color:#6aff9a99;">혁신개발당</div>
+        </div>
+        <div class="mini-card yeonwoo">
+          <div class="icon">🕷️</div>
+          장연우
+          <div style="font-size:9px; font-weight:400; color:#d06aff99;">암흑이익당</div>
+        </div>
+      </div>
+      <div class="screen-info">
+        <h3>후보 공개 & 당 가입</h3>
+        <p>3명의 NPC 후보 카드. 공약, 영향 산업, 당원 혜택을 확인하고 당에 가입하거나 무소속 유지.</p>
+        <span class="screen-tag" style="background: rgba(106,176,255,0.15); color: #6ab0ff;">1라운드</span>
+      </div>
+    </div>
+
+    <!-- 투표 -->
+    <div class="screen-card">
+      <div class="screen-preview mock-vote">
+        <div style="font-size: 13px; color: #888; margin-bottom: 4px;">실시간 투표 현황</div>
+        <div class="vote-bar-wrap">
+          <div class="vote-bar-label"><span>⚔️ 박준혁</span><span>42%</span></div>
+          <div class="vote-bar"><div class="vote-fill" style="width:42%; background: linear-gradient(90deg, #1a2a4a, #6ab0ff);"></div></div>
+        </div>
+        <div class="vote-bar-wrap">
+          <div class="vote-bar-label"><span>🧪 정상린</span><span>35%</span></div>
+          <div class="vote-bar"><div class="vote-fill" style="width:35%; background: linear-gradient(90deg, #1a3a2a, #6aff9a);"></div></div>
+        </div>
+        <div class="vote-bar-wrap">
+          <div class="vote-bar-label"><span>🕷️ 장연우</span><span>23%</span></div>
+          <div class="vote-bar"><div class="vote-fill" style="width:23%; background: linear-gradient(90deg, #2a1a2a, #d06aff);"></div></div>
+        </div>
+      </div>
+      <div class="screen-info">
+        <h3>대통령 선거</h3>
+        <p>실시간 투표 현황 바. 투표 마감 후 당선자 발표 연출. 정책이 다음 라운드 경제를 결정.</p>
+        <span class="screen-tag" style="background: rgba(106,176,255,0.15); color: #6ab0ff;">1라운드</span>
+      </div>
+    </div>
+
+    <!-- 주식 -->
+    <div class="screen-card">
+      <div class="screen-preview mock-stock" id="stockChart">
+      </div>
+      <div class="screen-info">
+        <h3>주식 거래소</h3>
+        <p>회사별 주가 차트. 매수/매도 버튼. 대통령 정책에 따라 산업별 등락이 달라짐.</p>
+        <span class="screen-tag" style="background: rgba(106,255,154,0.15); color: #6aff9a;">2라운드~</span>
+      </div>
+    </div>
+
+    <!-- 은행 -->
+    <div class="screen-card">
+      <div class="screen-preview mock-bank">
+        <div style="font-size: 13px; color: #f0c040; font-weight: 700;">🏦 판타지 은행</div>
+        <div class="bank-row">
+          <span class="emoji">💰</span>
+          <span class="label">대출</span>
+          <span class="value">최대 300G</span>
+        </div>
+        <div class="bank-row">
+          <span class="emoji">📤</span>
+          <span class="label">이체</span>
+          <span class="value">플레이어 → 플레이어</span>
+        </div>
+        <div class="bank-row">
+          <span class="emoji">📊</span>
+          <span class="label">이자율</span>
+          <span class="value">라운드당 10%</span>
+        </div>
+      </div>
+      <div class="screen-info">
+        <h3>은행 시스템</h3>
+        <p>대출, 상환, 플레이어 간 송금. 라운드마다 이자 자동 계산. 파산 시 특별 이벤트.</p>
+        <span class="screen-tag" style="background: rgba(255,107,107,0.15); color: #ff6b6b;">전 라운드</span>
+      </div>
+    </div>
+
+    <!-- 운영자 대시보드 -->
+    <div class="screen-card">
+      <div class="screen-preview mock-dashboard">
+        <div style="font-size: 11px; color: #888; padding: 0 14px; margin-bottom: 4px;">운영자 대시보드 — 전체 자산 현황</div>
+        <div class="dash-row">
+          <span class="rank">1</span>
+          <span class="name">플레이어A</span>
+          <div class="dash-bar"><div class="dash-bar-fill" style="width:85%; background: linear-gradient(90deg, #f0c040, #ff6b6b);"></div></div>
+          <span class="gold">850G</span>
+        </div>
+        <div class="dash-row">
+          <span class="rank">2</span>
+          <span class="name">플레이어B</span>
+          <div class="dash-bar"><div class="dash-bar-fill" style="width:62%; background: linear-gradient(90deg, #f0c040, #ff8c40);"></div></div>
+          <span class="gold">620G</span>
+        </div>
+        <div class="dash-row">
+          <span class="rank">3</span>
+          <span class="name">플레이어C</span>
+          <div class="dash-bar"><div class="dash-bar-fill" style="width:45%; background: linear-gradient(90deg, #f0c040, #ffa040);"></div></div>
+          <span class="gold">450G</span>
+          <span class="debt">(-200 빚)</span>
+        </div>
+        <div class="dash-row">
+          <span class="rank">4</span>
+          <span class="name">플레이어D</span>
+          <div class="dash-bar"><div class="dash-bar-fill" style="width:30%; background: linear-gradient(90deg, #666, #888);"></div></div>
+          <span class="gold">300G</span>
+        </div>
+      </div>
+      <div class="screen-info">
+        <h3>운영자 대시보드</h3>
+        <p>전체 플레이어 순자산, 보유 주식, 빚 현황 실시간 확인. 골드 수정, 거래 기록 관리.</p>
+        <span class="screen-tag" style="background: rgba(208,106,255,0.15); color: #d06aff;">운영자 전용</span>
+      </div>
+    </div>
+
+    <!-- 도박 -->
+    <div class="screen-card">
+      <div class="screen-preview mock-gambling">
+        <div class="gamble-item">
+          <div class="icon">🏇</div>
+          경마
+        </div>
+        <div class="gamble-item">
+          <div class="icon">🎰</div>
+          도박
+        </div>
+        <div class="gamble-item">
+          <div class="icon">🎟️</div>
+          복권
+        </div>
+      </div>
+      <div class="screen-info">
+        <h3>도박 / 경마 / 복권</h3>
+        <p>라운드가 진행될수록 추가되는 고위험 시스템. 뒤처진 플레이어의 역전 기회.</p>
+        <span class="screen-tag" style="background: rgba(255,200,64,0.15); color: #ffc840;">3~5라운드</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════ 플레이어 구조 ═══════════ -->
+<section id="player">
+  <h2>플레이어 자산 구조</h2>
+  <p class="subtitle">각 플레이어가 가지는 데이터</p>
+
+  <div class="player-struct">
+    <div class="struct-row">
+      <div class="struct-icon">👤</div>
+      <div class="struct-label">이름</div>
+      <div class="struct-value">플레이어 이름</div>
+      <div class="struct-example">"김민수"</div>
+    </div>
+    <div class="struct-row">
+      <div class="struct-icon">💰</div>
+      <div class="struct-label">보유 골드</div>
+      <div class="struct-value">현재 가진 현금</div>
+      <div class="struct-example">500G</div>
+    </div>
+    <div class="struct-row">
+      <div class="struct-icon">📈</div>
+      <div class="struct-label">보유 주식</div>
+      <div class="struct-value">회사별 보유 수량</div>
+      <div class="struct-example">건설 3주, 기술 2주</div>
+    </div>
+    <div class="struct-row">
+      <div class="struct-icon">🏦</div>
+      <div class="struct-label">빚 (대출)</div>
+      <div class="struct-value">은행에서 빌린 금액</div>
+      <div class="struct-example">-200G</div>
+    </div>
+    <div class="struct-row">
+      <div class="struct-icon">🏛️</div>
+      <div class="struct-label">소속 당</div>
+      <div class="struct-value">가입한 당 or 무소속</div>
+      <div class="struct-example">강철방위당</div>
+    </div>
+    <div class="struct-row" style="border-bottom: none; background: rgba(240,192,64,0.05); border-radius: 8px; padding: 12px 0; margin-top: 8px;">
+      <div class="struct-icon">⭐</div>
+      <div class="struct-label" style="color: #f0c040;">순자산</div>
+      <div class="struct-value">골드 + 주식가치 - 빚</div>
+      <div class="struct-example" style="font-size: 18px;">= 780G</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 시스템 연결 ═══════════ -->
+<section id="system">
+  <h2>시스템 연결 관계</h2>
+  <p class="subtitle">정치 → 경제 → 금융이 어떻게 맞물리는지</p>
+
+  <div class="sys-map">
+    <div class="sys-node">
+      <div class="icon">🏛️</div>
+      <h3>정치 시스템</h3>
+      <p>대통령 선출<br>정책 결정<br>당원 혜택</p>
+    </div>
+    <div class="sys-node">
+      <div class="icon">📈</div>
+      <h3>경제 시스템</h3>
+      <p>주식 매매<br>가격 변동<br>정보 카드</p>
+    </div>
+    <div class="sys-node">
+      <div class="icon">🏦</div>
+      <h3>금융 시스템</h3>
+      <p>대출 / 상환<br>플레이어 간 이체<br>이자 계산</p>
+    </div>
+
+    <div class="sys-arrows">
+      정치가 <span>경제 규칙</span>을 바꾸고 → 경제가 <span>돈의 흐름</span>을 만들고 → 금융이 <span>자산을 추적</span>한다
+    </div>
+
+    <div class="sys-node">
+      <div class="icon">🎰</div>
+      <h3>도박 시스템</h3>
+      <p>경마 / 도박 / 복권<br>고위험 고수익<br>역전 기회</p>
+    </div>
+    <div class="sys-node">
+      <div class="icon">🧠</div>
+      <h3>정보 시스템</h3>
+      <p>비대칭 정보<br>공유 / 거래<br>거짓말 가능</p>
+    </div>
+    <div class="sys-node">
+      <div class="icon">📊</div>
+      <h3>운영자 관리</h3>
+      <p>대시보드<br>거래 기록<br>골드 수정</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 작업 순서 ═══════════ -->
+<section id="pipeline">
+  <h2>개발 작업 순서</h2>
+  <p class="subtitle">이 순서대로 만들면 됩니다</p>
+
+  <div class="pipeline">
+    <div class="pipe-phase">
+      <div class="pipe-num">PHASE 1</div>
+      <div class="pipe-title">프롤로그 시네마틱</div>
+      <div class="pipe-desc">대본 텍스트 타이핑 연출 + 배경 전환 + BGM</div>
+      <div class="pipe-output">→ 이것만 완성해도 발표/시연 가능</div>
+    </div>
+    <div class="pipe-phase">
+      <div class="pipe-num">PHASE 2</div>
+      <div class="pipe-title">정치 시스템</div>
+      <div class="pipe-desc">후보 카드 UI + 당 가입 + 투표 + 결과 연출</div>
+      <div class="pipe-output">→ 선거 진행 가능</div>
+    </div>
+    <div class="pipe-phase">
+      <div class="pipe-num">PHASE 3</div>
+      <div class="pipe-title">금융 관리 (은행)</div>
+      <div class="pipe-desc">플레이어 등록 + 골드 관리 + 대출/이체 + 운영자 대시보드</div>
+      <div class="pipe-output">→ 현금 거래 추적 가능 (주식보다 먼저)</div>
+    </div>
+    <div class="pipe-phase">
+      <div class="pipe-num">PHASE 4</div>
+      <div class="pipe-title">경제 시스템 (주식)</div>
+      <div class="pipe-desc">회사/주가 데이터 + 매수/매도 + 정보 카드 + 차트</div>
+      <div class="pipe-output">→ 2라운드 주식 게임 진행 가능</div>
+    </div>
+    <div class="pipe-phase">
+      <div class="pipe-num">PHASE 5</div>
+      <div class="pipe-title">도박 시스템</div>
+      <div class="pipe-desc">경마 + 도박 + 복권</div>
+      <div class="pipe-output">→ 3~5라운드 확장 콘텐츠</div>
+    </div>
+    <div class="pipe-phase">
+      <div class="pipe-num">PHASE 6</div>
+      <div class="pipe-title">전체 연결 + 마무리</div>
+      <div class="pipe-desc">라운드 루프 + 순위표 + 최종 결산</div>
+      <div class="pipe-output">→ 풀 게임 완성</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  판타지 공화국 — 코딩 동아리 프로젝트
+</footer>
+
+<script>
+  // ── Stock chart bars ──
+  const stockEl = document.getElementById('stockChart');
+  const colors = ['#6ab0ff','#6aff9a','#ff6b6b','#f0c040','#d06aff','#ff8c40'];
+  const data = [30,45,60,40,75,55,35,65,80,50,70,45,60,85,40,55,70,90,50,65,75,55,40,60,80,70,55,45,65,50];
+  data.forEach((h, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'stock-bar';
+    bar.style.height = (h * 1.8) + 'px';
+    bar.style.background = h > 60
+      ? `linear-gradient(180deg, #6aff9a, #2a4a3a)`
+      : h < 40
+        ? `linear-gradient(180deg, #ff6b6b, #4a2a2a)`
+        : `linear-gradient(180deg, #f0c040, #4a3a1a)`;
+    bar.style.opacity = 0.4 + (i / data.length) * 0.6;
+    stockEl.appendChild(bar);
+  });
+
+  // ── Nav active state ──
+  const navLinks = document.querySelectorAll('nav a');
+  const sections = document.querySelectorAll('section');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 120) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+</script>
+
+</body>
+</html>
