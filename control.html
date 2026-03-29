@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>판타지 공화국 — 컨트롤러</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #0a0a0f; color: #e0e0e0;
+      height: 100vh; display: flex; flex-direction: column;
+    }
+
+    /* 상단 바 */
+    .ctrl-top {
+      background: #0e0e18; border-bottom: 1px solid #1a1a2e;
+      padding: 10px 16px; display: flex; align-items: center;
+      justify-content: space-between; flex-shrink: 0;
+    }
+    .ctrl-top .logo { font-weight: 900; font-size: 13px; color: #f0c040; }
+    .ctrl-top .actions { display: flex; gap: 6px; }
+    .ctrl-top button {
+      background: #1a1a2e; border: 1px solid #2a2a3e; color: #888;
+      padding: 5px 12px; border-radius: 6px; font-size: 11px;
+      cursor: pointer; font-family: inherit;
+    }
+    .ctrl-top button:hover { border-color: #f0c040; color: #f0c040; }
+    .ctrl-top button.active-btn { background: #f0c040; color: #000; border-color: #f0c040; }
+
+    /* 라운드 탭 */
+    .round-tabs {
+      background: #0e0e18; border-bottom: 1px solid #1a1a2e;
+      padding: 6px 16px; display: flex; gap: 4px;
+      overflow-x: auto; flex-shrink: 0;
+    }
+    .rtab {
+      background: none; border: 1px solid #1e1e30; color: #555;
+      padding: 4px 12px; border-radius: 14px; font-size: 11px;
+      cursor: pointer; white-space: nowrap; font-family: inherit;
+    }
+    .rtab:hover { color: #aaa; }
+    .rtab.active { background: rgba(240,192,64,0.1); color: #f0c040; border-color: rgba(240,192,64,0.3); }
+
+    /* 메인 영역 */
+    .ctrl-main {
+      flex: 1; display: flex; overflow: hidden;
+    }
+
+    /* 대사 목록 (왼쪽) */
+    .cue-list {
+      flex: 1; overflow-y: auto; padding: 12px 16px;
+      border-right: 1px solid #1a1a2e;
+    }
+    .cue {
+      padding: 12px 14px; margin: 4px 0;
+      background: #12121c; border: 1px solid #1e1e30;
+      border-radius: 8px; cursor: pointer;
+      transition: all 0.2s; font-size: 13px;
+    }
+    .cue:hover { border-color: #333; }
+    .cue.active-cue {
+      border-color: #f0c040; background: rgba(240,192,64,0.05);
+    }
+    .cue.sent { opacity: 0.4; }
+    .cue-speaker {
+      font-size: 10px; font-weight: 700; margin-bottom: 4px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .cue-speaker.narr { color: #f0c040; }
+    .cue-speaker.sys { color: #6ab0ff; }
+    .cue-speaker.dir { color: #555; }
+    .cue-speaker.junhyuk { color: #6ab0ff; }
+    .cue-speaker.sangrin { color: #6aff9a; }
+    .cue-speaker.yeonwoo { color: #d06aff; }
+    .cue-speaker.vip { color: #ffd700; }
+    .cue-speaker.squid { color: #ff2d78; }
+    .cue-preview { color: #888; font-size: 12px; line-height: 1.6; }
+    .cue-memo { color: #444; font-size: 11px; margin-top: 4px; font-style: italic; }
+
+    /* 오른쪽 패널 */
+    .side-panel {
+      width: 280px; flex-shrink: 0;
+      display: flex; flex-direction: column;
+      padding: 16px; overflow-y: auto;
+    }
+    .panel-section {
+      margin-bottom: 20px;
+    }
+    .panel-title {
+      font-size: 11px; font-weight: 700; color: #555;
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    /* 현재 표시중 미리보기 */
+    .preview-box {
+      background: #000; border: 1px solid #1a1a2e;
+      border-radius: 8px; padding: 16px;
+      font-size: 12px; color: #aaa; line-height: 1.6;
+      min-height: 100px;
+    }
+    .preview-box em { color: #f0c040; font-style: normal; font-weight: 700; }
+
+    /* 타이머 */
+    .timer-display {
+      font-size: 48px; font-weight: 900; color: #f0c040;
+      text-align: center; font-variant-numeric: tabular-nums;
+    }
+    .timer-controls { display: flex; gap: 6px; margin-top: 8px; }
+    .timer-btn {
+      flex: 1; padding: 8px; border-radius: 6px;
+      border: 1px solid #2a2a3e; background: #1a1a2e;
+      color: #888; font-size: 12px; cursor: pointer;
+      font-family: inherit;
+    }
+    .timer-btn:hover { border-color: #f0c040; color: #f0c040; }
+
+    /* 하단 컨트롤 */
+    .ctrl-bottom {
+      background: #0e0e18; border-top: 1px solid #1a1a2e;
+      padding: 12px 16px; display: flex; align-items: center;
+      justify-content: space-between; flex-shrink: 0;
+    }
+    .big-btn {
+      padding: 12px 32px; border-radius: 8px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      font-family: inherit; transition: all 0.2s;
+    }
+    .big-btn.prev-btn {
+      background: none; border: 1px solid #333; color: #888;
+    }
+    .big-btn.prev-btn:hover { border-color: #f0c040; color: #f0c040; }
+    .big-btn.next-btn {
+      background: #f0c040; border: none; color: #000;
+    }
+    .big-btn.next-btn:hover { background: #ffd060; }
+    .big-btn:disabled { opacity: 0.3; cursor: default; }
+    .pos-indicator { color: #444; font-size: 13px; font-weight: 700; }
+
+    /* 키보드 힌트 */
+    .key-hints {
+      position: fixed; bottom: 70px; right: 16px;
+      color: #222; font-size: 10px; text-align: right;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 상단 -->
+<div class="ctrl-top">
+  <span class="logo">컨트롤러</span>
+  <div class="actions">
+    <button onclick="openPresent()" id="presentBtn">프레젠테이션 창 열기</button>
+    <button onclick="sendBlack()">화면 끄기</button>
+    <a href="index.html" style="color:#555; text-decoration:none; font-size:11px; padding:5px 12px;">메인</a>
+  </div>
+</div>
+
+<!-- 라운드 탭 -->
+<div class="round-tabs" id="roundTabs"></div>
+
+<!-- 메인 -->
+<div class="ctrl-main">
+  <!-- 대사 목록 -->
+  <div class="cue-list" id="cueList"></div>
+
+  <!-- 사이드 패널 -->
+  <div class="side-panel">
+    <div class="panel-section">
+      <div class="panel-title">현재 화면</div>
+      <div class="preview-box" id="previewBox">
+        프레젠테이션 창을 열고 대사를 클릭하세요
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">타이머</div>
+      <div class="timer-display" id="timerDisplay">5:00</div>
+      <div class="timer-controls">
+        <button class="timer-btn" onclick="startTimer(180)">3분</button>
+        <button class="timer-btn" onclick="startTimer(300)">5분</button>
+        <button class="timer-btn" onclick="stopTimer()">정지</button>
+        <button class="timer-btn" onclick="resetTimer()">리셋</button>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">단축키</div>
+      <div style="font-size:11px; color:#444; line-height:2;">
+        <b style="color:#888;">→ Space</b> 다음 대사<br>
+        <b style="color:#888;">←</b> 이전 대사<br>
+        <b style="color:#888;">B</b> 화면 끄기<br>
+        <b style="color:#888;">T</b> 5분 타이머<br>
+        <b style="color:#888;">S</b> 타이머 정지
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 하단 -->
+<div class="ctrl-bottom">
+  <button class="big-btn prev-btn" id="prevBtn" onclick="goCue(currentCue-1)">← 이전</button>
+  <span class="pos-indicator" id="posIndicator"></span>
+  <button class="big-btn next-btn" id="nextBtn" onclick="goCue(currentCue+1)">다음 →</button>
+</div>
+
+<script>
+// ═══ 대본 데이터 ═══
+const SCRIPT = [
+  // ── 0라운드: 프롤로그 ──
+  { round: '0라운드 — 프롤로그', roundIdx: 0, speaker: '연출', cls: 'dir',
+    html: '화면: 무너진 도시. 먼지와 잿더미.<br>BGM: 낮고 무거운 앰비언트.' },
+
+  { round: '0라운드 — 프롤로그', roundIdx: 0, speaker: '내레이션', cls: 'narr',
+    html: '세계는… <em>멸망했습니다.</em><br><br>국가는 붕괴했고, 질서는 사라졌으며,<br>법은 더 이상 존재하지 않습니다.' },
+
+  { round: '0라운드 — 프롤로그', roundIdx: 0, speaker: '연출', cls: 'dir',
+    html: '폭발 흔적, 붕괴된 건물, 버려진 차량.<br>3초 정적. 바람 소리.' },
+
+  { round: '0라운드 — 프롤로그', roundIdx: 0, speaker: '내레이션', cls: 'narr',
+    html: '하지만…<br><br><em>인류는 멸망하지 않았습니다.</em><br><br>여러분은, 그 마지막 생존자들입니다.' },
+
+  { round: '0라운드 — 프롤로그', roundIdx: 0, speaker: '연출', cls: 'dir',
+    html: '사람들이 모여 있는 장면. 깃발이 세워진다.<br>도시가 재건되는 모습. BGM 고조.' },
+
+  { round: '0라운드 — 프롤로그', roundIdx: 0, speaker: '내레이션', cls: 'narr',
+    html: '그리고 지금,<br>여러분은 새로운 국가에 입장합니다.' },
+
+  { round: '0라운드 — 프롤로그', roundIdx: 0, speaker: '연출', cls: 'dir',
+    html: '거대한 문이 열린다.<br>타이틀 "판타지 공화국" 등장.' },
+
+  { round: '0라운드 — 프롤로그', roundIdx: 0, speaker: '내레이션', cls: 'narr',
+    html: '이곳은 <em>판타지 공화국.</em><br><br>이 나라에는 왕이 없습니다.<br>지배자도, 정해진 규칙도 없습니다.<br><br>오직 하나만 존재합니다.<br><br><em>돈.</em><br><br>이곳에서 돈은 단순한 자원이 아닙니다.<br><em>생존이며, 기회이며, 권력입니다.</em>' },
+
+  { round: '0라운드 — 프롤로그', roundIdx: 0, speaker: '시스템', cls: 'sys',
+    html: '여러분은 전부 <em>1,000골드</em> <span class="rub">(50,000루블)</span>를 가지고<br>게임을 시작합니다.',
+    memo: '→ 각 플레이어에게 1,000G 현금 배분' },
+
+  { round: '0라운드 — 프롤로그', roundIdx: 0, speaker: '내레이션', cls: 'narr',
+    html: '여러분은 선택해야 합니다.<br>협력할 것인지, 속일 것인지, 지배할 것인지.<br><br>그리고… 이 나라의 <em>첫 번째 규칙</em>을 정할 시간입니다.<br><br><em>누가 이 공화국을 이끌 것인가.</em>' },
+
+  { round: '0라운드 — 프롤로그', roundIdx: 0, speaker: '내레이션', cls: 'narr',
+    html: '그리고 한 가지 더.<br><br>이 게임의 끝에서, 여러분은 세 갈래 길 앞에 서게 됩니다.<br><br><em>2,500골드</em> <span class="rub">(125,000루블)</span> 이상을 모은 자는 —<br><em>VIP룸</em>에 초대됩니다.<br><br>하지만 순자산이 <em>마이너스</em>가 된 자는 —<br><em>오징어 게임</em>에 진출하게 됩니다.' },
+
+  // ── 1라운드: 선거 ──
+  { round: '1라운드 — 대통령 선거', roundIdx: 1, speaker: '내레이션', cls: 'narr',
+    html: '인류를 지켜낸 세 명의 지도자가 있습니다.<br>그들은 각자의 방식으로 이 나라를 바꾸려 합니다.<br><br>곧, 세 명의 후보가 공개됩니다.' },
+
+  { round: '1라운드 — 대통령 선거', roundIdx: 1, speaker: '연출', cls: 'dir',
+    html: '3명의 실루엣이 등장. 하나씩 밝혀진다.' },
+
+  { round: '1라운드 — 대통령 선거', roundIdx: 1, speaker: '후보 1 — 박준혁', cls: 'junhyuk', isCandidate: true,
+    html: '<em>⚔️ 박준혁 — 강철방위당</em><br><br><span class="q">"질서 없는 자유는 혼돈일 뿐이다."</span><br><br>멸망 이전, 그는 군 기갑부대의 지휘관이었습니다.<br>문명이 무너진 날, 그는 군용마 부대를 이끌고 생존자들을 구출했습니다.<br><br>— 국방세 <em>50G</em> <span class="rub">(2,500루블)</span> 부과<br>— 수익 1위 <em>보너스 100G</em> <span class="rub">(5,000루블)</span><br>— 건설, 군수 산업 성장' },
+
+  { round: '1라운드 — 대통령 선거', roundIdx: 1, speaker: '후보 2 — 정상린', cls: 'sangrin', isCandidate: true,
+    html: '<em>🧪 정상린 — 혁신개발당</em><br><br><span class="q">"성장은 선택이 아니라 필수다."</span><br><br>멸망 이전, 그는 국가 데이터센터의 수석 연구원이었습니다.<br>세상이 무너질 때, 그는 핵심 서버를 지켜냈습니다.<br><br>— 모든 회사 <em>변동폭 ×1.5배</em><br>— 당원에게 <em>추가 정보 카드</em><br>— 기술, 에너지 산업 성장' },
+
+  { round: '1라운드 — 대통령 선거', roundIdx: 1, speaker: '후보 3 — 장연우', cls: 'yeonwoo', isCandidate: true,
+    html: '<em>🕷️ 장연우 — 암흑이익당</em><br><br><span class="q">"누군가 잃어야, 누군가는 얻는다."</span><br><br>멸망 이전, 그의 과거를 아는 사람은 없습니다.<br>혼란 속에서 그가 가장 먼저 한 일은 — 지하 벙커에 카지노를 연 것이었습니다.<br><br>— 자산 1위에게서 <em>10% 회수</em><br>— 전원에게 <em>균등 분배</em><br>— 도박, 암시장 산업 성장' },
+
+  { round: '1라운드 — 대통령 선거', roundIdx: 1, speaker: '시스템', cls: 'sys',
+    html: '<em>당원 가입</em>이 시작됩니다.<br><br>가입비: <em>100골드</em> <span class="rub">(5,000루블)</span><br>가입하지 않아도 게임 참여 가능.<br><br><span class="q">당원은 소속 후보 당선 시 추가 혜택.</span>',
+    memo: '→ 가입 시간 3분. 100G 회수. 명단 기록.' },
+
+  { round: '1라운드 — 대통령 선거', roundIdx: 1, speaker: '내레이션', cls: 'narr',
+    html: '당원 가입이 종료되었습니다.<br><br>지금부터, 이 나라의 <em>초대 대통령 선거</em>가 진행됩니다.<br><br>당신의 선택이, 이 나라의 첫 번째 권력을 결정합니다.' },
+
+  { round: '1라운드 — 대통령 선거', roundIdx: 1, speaker: '시스템', cls: 'sys',
+    html: '세 후보 중 한 명에게 투표하십시오.<br>무소속도 투표 가능. 기권 가능.<br><br>투표는 <em>비공개</em>로 진행됩니다.',
+    memo: '→ 투표 2분. 집계 후 결과 발표.' },
+
+  { round: '1라운드 — 대통령 선거', roundIdx: 1, speaker: '연출', cls: 'dir',
+    html: '투표 결과 바 애니메이션. 드럼롤.' },
+
+  { round: '1라운드 — 대통령 선거', roundIdx: 1, speaker: '내레이션', cls: 'narr',
+    html: '투표가 종료되었습니다.<br><br>판타지 공화국의 초대 대통령은…<br><br><em>[당선자 이름]</em>입니다.' },
+
+  { round: '1라운드 — 대통령 선거', roundIdx: 1, speaker: '시스템', cls: 'sys',
+    html: '<span class="q">(당선자에 따라 읽기)</span><br><br>⚔️ 박준혁: 국방세 50G + 1위 보너스 100G<br>🧪 정상린: 변동폭 ×1.5 + 당원 정보카드<br>🕷️ 장연우: 1위 자산 10% 회수 → 전원 분배' },
+
+  { round: '1라운드 — 대통령 선거', roundIdx: 1, speaker: '내레이션', cls: 'narr',
+    html: '대통령이 결정되었습니다.<br>이제, 이 나라에 <em>경제</em>가 시작됩니다.<br><br>다음 라운드부터, 여러분은 <em>회사에 투자</em>할 수 있습니다.<br>정보를 모으고, 판단하고, 돈을 굴리십시오.' },
+
+  // ── 2라운드: 주식 ──
+  { round: '2라운드 — 주식 투자', roundIdx: 2, speaker: '내레이션', cls: 'narr',
+    html: '판타지 공화국에 <em>6개의 회사</em>가 설립되었습니다.<br><br>각 회사는 서로 다른 산업에 속해 있으며,<br>대통령의 정책에 따라 성장하거나 쇠퇴합니다.' },
+
+  { round: '2라운드 — 주식 투자', roundIdx: 2, speaker: '시스템', cls: 'sys',
+    html: '🏗️ <em>철벽건설</em> — 건설 / 1주 <em>200G</em> <span class="rub">(10,000루블)</span><br>🔫 <em>레드포지 군수</em> — 군수 / 1주 <em>200G</em><br>💻 <em>네오텍</em> — 기술 / 1주 <em>200G</em><br>⚡ <em>볼트에너지</em> — 에너지 / 1주 <em>200G</em><br>🎪 <em>미라주 엔터</em> — 엔터 / 1주 <em>200G</em><br>🕳️ <em>블랙마켓</em> — 암시장 / 1주 <em>200G</em>' },
+
+  { round: '2라운드 — 주식 투자', roundIdx: 2, speaker: '내레이션', cls: 'narr',
+    html: '모든 회사는 현재 <em>주당 200골드.</em><br><br>하지만 다음 라운드에는…<br>누군가는 오르고, 누군가는 떨어집니다.<br><br><em>어떤 회사가 오를지는 — 정보에 달려 있습니다.</em>' },
+
+  { round: '2라운드 — 주식 투자', roundIdx: 2, speaker: '시스템', cls: 'sys',
+    html: '각 플레이어에게 <em>정보 카드 1장</em> 비공개 지급.<br><br>일부 카드는 <em>불완전하거나 거짓</em>일 수 있습니다.<br><br>정보를 <em>공유, 거래, 거짓말</em>할 수 있습니다.',
+    memo: '→ 정보 카드 1인 1장 배분.' },
+
+  { round: '2라운드 — 주식 투자', roundIdx: 2, speaker: '시스템', cls: 'sys',
+    html: '지금부터 <em>5분간</em> 자유 시간입니다.<br><br>— 정보 교환 가능<br>— 주식 매수 가능 (100G 단위)<br>— 은행 대출 가능',
+    memo: '→ 5분 타이머 시작!' },
+
+  { round: '2라운드 — 주식 투자', roundIdx: 2, speaker: '내레이션', cls: 'narr',
+    html: '투자 시간이 종료되었습니다.<br><br>지금부터 <em>시장 결과</em>를 발표합니다.' },
+
+  { round: '2라운드 — 주식 투자', roundIdx: 2, speaker: '시스템', cls: 'sys',
+    html: '🏗️ 철벽건설: 200G → <em>[변동가]</em><br>🔫 레드포지: 200G → <em>[변동가]</em><br>💻 네오텍: 200G → <em>[변동가]</em><br>⚡ 볼트에너지: 200G → <em>[변동가]</em><br>🎪 미라주 엔터: 200G → <em>[변동가]</em><br>🕳️ 블랙마켓: 200G → <em>[변동가]</em>',
+    memo: '→ 변동표 적용. 대통령 정책 보정. 자산 재계산.' },
+
+  { round: '2라운드 — 주식 투자', roundIdx: 2, speaker: '내레이션', cls: 'narr',
+    html: '2라운드가 종료되었습니다.<br><span class="q">현재 순위가 화면에 표시됩니다.</span><br><br>다음 라운드에는 새로운 기회가 열립니다.' },
+
+  // ── 3라운드: 경마 ──
+  { round: '3라운드 — 경마장 오픈', roundIdx: 3, speaker: '내레이션', cls: 'narr',
+    html: '판타지 공화국에 새로운 시설이 문을 열었습니다.<br><br>강철방위당의 <em>박준혁</em>이<br>군용마 훈련장을 개조하여<br>이 나라 최초의 <em>경마장</em>을 세웠습니다.<br><br><span class="q">"말은 전쟁터에서만 달리는 게 아니다."</span>' },
+
+  { round: '3라운드 — 경마장 오픈', roundIdx: 3, speaker: '시스템', cls: 'sys',
+    html: '경마에는 <em>4마리의 말</em>이 출전합니다.<br><br>🐎 1번 말 — 배당 <em>×2</em> (승률 높음)<br>🐎 2번 말 — 배당 <em>×3</em><br>🐎 3번 말 — 배당 <em>×5</em><br>🐎 4번 말 — 배당 <em>×10</em> (승률 낮음)<br><br>베팅: <em>100G</em>~<em>200G</em>' },
+
+  { round: '3라운드 — 경마장 오픈', roundIdx: 3, speaker: '시스템', cls: 'sys',
+    html: '<em>자유 시간 5분</em><br>주식 + 정보 교환 + 경마 베팅',
+    memo: '→ 5분 타이머!' },
+
+  { round: '3라운드 — 경마장 오픈', roundIdx: 3, speaker: '시스템', cls: 'sys',
+    html: '경마 결과 → 주가 변동 → 정책 적용 → 순위 발표',
+    memo: '→ 경마 결과 발표 후 주가 변동.' },
+
+  // ── 4라운드: 도박+복권 ──
+  { round: '4라운드 — 연우의 소굴', roundIdx: 4, speaker: '내레이션', cls: 'narr',
+    html: '공화국의 뒷골목에 거대한 문이 열렸습니다.<br><br>암흑이익당의 <em>장연우</em>가<br>지하 벙커 시절부터 운영하던 카지노를<br>공식적으로 확장했습니다.<br><br>사람들은 이곳을 <em>"연우의 소굴"</em>이라 부릅니다.' },
+
+  { round: '4라운드 — 연우의 소굴', roundIdx: 4, speaker: '내레이션', cls: 'narr',
+    html: '홀짝 테이블이 돌아가고…<br>그 옆에는 <em>복권 판매대</em>가 세워졌습니다.<br><br><span class="q">"희망도 상품이다.<br>그리고 나는 그걸 팔 줄 안다."</span>' },
+
+  { round: '4라운드 — 연우의 소굴', roundIdx: 4, speaker: '시스템', cls: 'sys',
+    html: '<em>홀짝 도박</em><br>맞추면 <em>×2</em>, 틀리면 <em>전액 손실</em><br>베팅: <em>100G</em>~<em>500G</em> / 연속 최대 3회<br><br><em>복권</em><br>1장 <em>50G</em> <span class="rub">(2,500루블)</span> / 최대 3장<br>🥇 500G (5%) / 🥈 200G (15%) / 🥉 100G (30%) / ❌ 꽝 (50%)' },
+
+  { round: '4라운드 — 연우의 소굴', roundIdx: 4, speaker: '시스템', cls: 'sys',
+    html: '<em>자유 시간 5분</em><br>주식 + 경마 + 도박 + 복권 + 정보 교환',
+    memo: '→ 5분 타이머! + 은행 이자 적용 잊지 말기.' },
+
+  // ── 5라운드: 탄핵+정보거래소 ──
+  { round: '5라운드 — 정보 거래소 & 탄핵', roundIdx: 5, speaker: '내레이션', cls: 'narr',
+    html: '판타지 공화국이 혼돈에 빠지고 있습니다.<br><br>부의 격차는 벌어졌고,<br>불만은 높아졌으며,<br>변화를 요구하는 목소리가 커지고 있습니다.' },
+
+  { round: '5라운드 — 정보 거래소 & 탄핵', roundIdx: 5, speaker: '내레이션', cls: 'narr',
+    html: '혁신개발당의 <em>정상린</em>이<br>살아남은 데이터베이스를 기반으로<br><em>정보 거래소</em>를 정식 오픈했습니다.<br><br><span class="q">"이제 정보에는 가격이 붙습니다.<br>진실을 원한다면… 돈을 내십시오."</span>' },
+
+  { round: '5라운드 — 정보 거래소 & 탄핵', roundIdx: 5, speaker: '시스템', cls: 'sys',
+    html: '추가 정보 카드 구매 가능!<br><br>1장: <em>100G</em> <span class="rub">(5,000루블)</span><br>1인 최대 2장 추가 구매' },
+
+  { round: '5라운드 — 정보 거래소 & 탄핵', roundIdx: 5, speaker: '내레이션', cls: 'narr',
+    html: '그리고, 국민들에게 한 가지 권리가 주어집니다.<br><br><em>탄핵 투표.</em><br><br>과반수가 찬성하면, 현 대통령은 물러나고<br><em>새로운 선거</em>가 진행됩니다.<br><br><span class="q">이번에는… 플레이어도 출마할 수 있습니다.</span>' },
+
+  { round: '5라운드 — 정보 거래소 & 탄핵', roundIdx: 5, speaker: '시스템', cls: 'sys',
+    html: '탄핵 투표: 유지 vs 탄핵<br><br><em>과반수 탄핵</em> → 6라운드 재선거<br><em>과반수 유지</em> → 현 정책 계속<br><br>출마비: <em>200G</em> <span class="rub">(10,000루블)</span>',
+    memo: '→ 탄핵 투표 2분.' },
+
+  // ── 6라운드~: 후반전 ──
+  { round: '6라운드~ — 후반전', roundIdx: 6, speaker: '내레이션', cls: 'narr',
+    html: '판타지 공화국의 역사가 흘러가고 있습니다.<br><br>누군가는 제국을 세웠고,<br>누군가는 폐허 속에 서 있습니다.<br><br>하지만 아직 끝나지 않았습니다.<br><br><em>마지막 기회가 남아 있습니다.</em>' },
+
+  { round: '6라운드~ — 후반전', roundIdx: 6, speaker: '시스템', cls: 'sys',
+    html: '후반 매 라운드:<br><br>1. (재선거 시) 대통령 선거<br>2. 정보 카드 + 추가 구매<br>3. 자유 시간 5분 — 전 시스템 오픈<br>4. 경마 → 주가 → 정책 → 이자 → 순위' },
+
+  // ── 최종 ──
+  { round: '최종 라운드 — 결산', roundIdx: 7, speaker: '내레이션', cls: 'narr',
+    html: '판타지 공화국의 시대가 저물고 있습니다.<br><br>모든 시장이 닫힙니다.<br>모든 주식이 현금화됩니다.<br>모든 빚이 정산됩니다.<br><br>지금부터, <em>최종 결산</em>을 시작합니다.' },
+
+  { round: '최종 라운드 — 결산', roundIdx: 7, speaker: '시스템', cls: 'sys',
+    html: '1. 모든 주식 → <em>강제 매도</em><br>2. 모든 대출 → <em>강제 상환</em><br>3. <em>순자산 = 골드 - 빚</em>' },
+
+  { round: '최종 라운드 — 결산', roundIdx: 7, speaker: '내레이션', cls: 'narr',
+    html: '결산이 완료되었습니다.<br><br>이제, 여러분의 운명이 갈립니다.' },
+
+  { round: '최종 라운드 — 결산', roundIdx: 7, speaker: 'VIP룸 진출', cls: 'vip',
+    html: '순자산 <em>2,500골드</em> 이상을 달성한 분들.<br><br>축하합니다.<br>여러분은 이 공화국의 <em>최상위 엘리트</em>입니다.<br><br><em>VIP룸</em>으로 이동하십시오.' },
+
+  { round: '최종 라운드 — 결산', roundIdx: 7, speaker: '일반 종료', cls: 'narr',
+    html: '순자산 0G ~ 2,500G 미만인 분들.<br><br>여러분은 살아남았습니다.<br>부자는 아니지만, 파멸도 피했습니다.' },
+
+  { round: '최종 라운드 — 결산', roundIdx: 7, speaker: '오징어 게임 진출', cls: 'squid',
+    html: '순자산이 <em>마이너스</em>인 분들.<br><br>여러분은 빚더미에 빠졌습니다.<br><br>하지만 기회가 하나 남아 있습니다.<br><br><em>오징어 게임.</em><br><br>살아남으면 빚이 탕감됩니다.<br>살아남지 못하면… 최하위 확정.' },
+
+  { round: '최종 라운드 — 결산', roundIdx: 7, speaker: '연출', cls: 'dir',
+    html: '3갈래 문: 금색(VIP) / 회색(일반) / 빨간색(오징어게임)<br>플레이어 이름이 각 문 위에 표시.' },
+
+  { round: '최종 라운드 — 결산', roundIdx: 7, speaker: '내레이션', cls: 'narr',
+    html: '모든 게임이 종료되었습니다.<br><br>판타지 공화국의 최종 승자는…<br><br><em>[VIP룸 최종 승자]</em>입니다.<br><br>당신은 폐허 속에서 시작하여,<br>이 나라의 <em>정점</em>에 섰습니다.<br><br><span class="q">…하지만 진짜 질문은 이것입니다.</span><br><br><em>당신은 어떤 방법으로 여기까지 왔습니까?</em>' },
+];
+
+const ROUNDS = ['프롤로그','1R 선거','2R 주식','3R 경마','4R 도박','5R 탄핵','6R~ 후반','최종'];
+
+// ═══ 채널 ═══
+const ch = new BroadcastChannel('fantasy-republic');
+let currentCue = 0;
+let currentRound = 0;
+
+// ═══ 라운드 탭 생성 ═══
+const tabsEl = document.getElementById('roundTabs');
+ROUNDS.forEach((name, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'rtab' + (i === 0 ? ' active' : '');
+  btn.textContent = name;
+  btn.onclick = () => {
+    const first = SCRIPT.findIndex(s => s.roundIdx === i);
+    if (first >= 0) goCue(first);
+  };
+  tabsEl.appendChild(btn);
+});
+
+// ═══ 큐 목록 생성 ═══
+const cueListEl = document.getElementById('cueList');
+SCRIPT.forEach((cue, i) => {
+  const div = document.createElement('div');
+  div.className = 'cue';
+  div.dataset.index = i;
+
+  const sp = document.createElement('div');
+  sp.className = 'cue-speaker ' + cue.cls;
+  sp.textContent = cue.speaker;
+
+  const preview = document.createElement('div');
+  preview.className = 'cue-preview';
+  preview.textContent = cue.html.replace(/<[^>]+>/g, ' ').substring(0, 80) + '…';
+
+  div.appendChild(sp);
+  div.appendChild(preview);
+
+  if (cue.memo) {
+    const memo = document.createElement('div');
+    memo.className = 'cue-memo';
+    memo.textContent = cue.memo;
+    div.appendChild(memo);
+  }
+
+  div.onclick = () => goCue(i);
+  cueListEl.appendChild(div);
+});
+
+// ═══ 큐 이동 ═══
+function goCue(i) {
+  if (i < 0 || i >= SCRIPT.length) return;
+
+  // 이전 큐 스타일
+  const allCues = cueListEl.querySelectorAll('.cue');
+  allCues.forEach((c, idx) => {
+    c.classList.remove('active-cue');
+    c.classList.toggle('sent', idx < i);
+  });
+
+  currentCue = i;
+  const cue = SCRIPT[i];
+
+  // 현재 큐 하이라이트
+  allCues[i].classList.add('active-cue');
+  allCues[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // 라운드 탭 업데이트
+  if (cue.roundIdx !== currentRound) {
+    currentRound = cue.roundIdx;
+    tabsEl.querySelectorAll('.rtab').forEach((t, idx) => {
+      t.classList.toggle('active', idx === currentRound);
+    });
+  }
+
+  // 프레젠테이션으로 전송
+  ch.postMessage({
+    type: 'show',
+    data: {
+      round: cue.round,
+      speaker: cue.speaker,
+      speakerClass: cue.cls,
+      html: cue.html,
+      isCandidate: cue.isCandidate || false,
+      progress: ((i + 1) / SCRIPT.length) * 100
+    }
+  });
+
+  // 미리보기
+  document.getElementById('previewBox').innerHTML = cue.html;
+
+  // 위치 표시
+  document.getElementById('posIndicator').textContent = (i + 1) + ' / ' + SCRIPT.length;
+  document.getElementById('prevBtn').disabled = i === 0;
+  document.getElementById('nextBtn').disabled = i === SCRIPT.length - 1;
+}
+
+function sendBlack() {
+  ch.postMessage({ type: 'black' });
+  document.getElementById('previewBox').innerHTML = '<span style="color:#333;">화면 꺼짐</span>';
+}
+
+function openPresent() {
+  window.open('present.html', 'present', 'width=1280,height=720');
+  document.getElementById('presentBtn').textContent = '프레젠테이션 창 열림';
+  document.getElementById('presentBtn').classList.add('active-btn');
+}
+
+// ═══ 타이머 ═══
+let timerInterval = null;
+let timerSeconds = 300;
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds / 60);
+  const s = timerSeconds % 60;
+  document.getElementById('timerDisplay').textContent =
+    m + ':' + String(s).padStart(2, '0');
+  if (timerSeconds <= 10) {
+    document.getElementById('timerDisplay').style.color = '#ff4444';
+  } else {
+    document.getElementById('timerDisplay').style.color = '#f0c040';
+  }
+}
+
+function startTimer(sec) {
+  stopTimer();
+  timerSeconds = sec;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+    updateTimerDisplay();
+    if (timerSeconds <= 0) { stopTimer(); }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+function resetTimer() {
+  stopTimer();
+  timerSeconds = 300;
+  updateTimerDisplay();
+}
+
+// ═══ 키보드 ═══
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goCue(currentCue + 1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goCue(currentCue - 1); }
+  if (e.key === 'b' || e.key === 'B') { sendBlack(); }
+  if (e.key === 't' || e.key === 'T') { startTimer(300); }
+  if (e.key === 's' || e.key === 'S') { stopTimer(); }
+});
+
+// 초기화
+updateTimerDisplay();
+</script>
+
+</body>
+</html>

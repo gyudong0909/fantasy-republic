@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>판타지 공화국 — 프레젠테이션</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; background: #000; color: #e0e0e0; }
+    body { font-family: 'Noto Sans KR', sans-serif; cursor: none; }
+
+    .screen {
+      width: 100vw; height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 60px 80px;
+      position: relative;
+    }
+
+    /* 라운드 표시 */
+    .round-badge {
+      position: absolute; top: 32px; left: 40px;
+      font-size: 13px; font-weight: 900; color: #f0c040;
+      background: rgba(240,192,64,0.08); padding: 6px 16px;
+      border-radius: 20px; border: 1px solid rgba(240,192,64,0.2);
+    }
+
+    /* 메인 텍스트 */
+    .main-text {
+      font-size: 28px; font-weight: 400; line-height: 2;
+      text-align: center; max-width: 900px;
+      opacity: 0; transform: translateY(20px);
+      animation: fadeIn 0.6s forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .main-text em {
+      font-style: normal; color: #f0c040; font-weight: 700;
+    }
+    .main-text .q {
+      color: #888; font-style: italic;
+    }
+    .main-text .rub {
+      color: #444; font-size: 18px;
+    }
+    .main-text .b { display: block; height: 16px; }
+
+    /* 스피커 라벨 */
+    .speaker-label {
+      font-size: 12px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 20px;
+      opacity: 0; animation: fadeIn 0.4s 0.1s forwards;
+    }
+    .speaker-label.narr { color: #f0c040; }
+    .speaker-label.sys { color: #6ab0ff; }
+    .speaker-label.dir { color: #555; }
+    .speaker-label.junhyuk { color: #6ab0ff; }
+    .speaker-label.sangrin { color: #6aff9a; }
+    .speaker-label.yeonwoo { color: #d06aff; }
+    .speaker-label.vip { color: #ffd700; }
+    .speaker-label.squid { color: #ff2d78; }
+
+    /* 후보 카드 특별 스타일 */
+    .main-text.candidate { text-align: left; }
+
+    /* 하단 진행 바 */
+    .progress-bar {
+      position: absolute; bottom: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, #f0c040, #ff6b6b);
+      transition: width 0.5s;
+    }
+
+    /* 대기 화면 */
+    .waiting {
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      height: 100vh; gap: 16px;
+    }
+    .waiting h1 {
+      font-size: 48px; font-weight: 900;
+      background: linear-gradient(135deg, #f0c040, #ff6b6b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .waiting p { color: #333; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<div class="waiting" id="waitingScreen">
+  <h1>판타지 공화국</h1>
+  <p>컨트롤러에서 시작하면 화면이 표시됩니다</p>
+</div>
+
+<div class="screen" id="presentScreen" style="display:none;">
+  <div class="round-badge" id="roundBadge"></div>
+  <div class="speaker-label" id="speakerLabel"></div>
+  <div class="main-text" id="mainText"></div>
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<script>
+const ch = new BroadcastChannel('fantasy-republic');
+
+ch.onmessage = (e) => {
+  const { type, data } = e.data;
+
+  if (type === 'show') {
+    document.getElementById('waitingScreen').style.display = 'none';
+    const screen = document.getElementById('presentScreen');
+    screen.style.display = 'flex';
+
+    document.getElementById('roundBadge').textContent = data.round || '';
+
+    const sl = document.getElementById('speakerLabel');
+    sl.textContent = data.speaker || '';
+    sl.className = 'speaker-label ' + (data.speakerClass || '');
+
+    const mt = document.getElementById('mainText');
+    mt.innerHTML = data.html || '';
+    mt.className = 'main-text' + (data.isCandidate ? ' candidate' : '');
+    // re-trigger animation
+    mt.style.animation = 'none';
+    mt.offsetHeight;
+    mt.style.animation = '';
+
+    const pb = document.getElementById('progressBar');
+    pb.style.width = data.progress + '%';
+  }
+
+  if (type === 'black') {
+    document.getElementById('waitingScreen').style.display = 'flex';
+    document.getElementById('presentScreen').style.display = 'none';
+  }
+};
+</script>
+
+</body>
+</html>
