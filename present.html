@@ -360,16 +360,16 @@ ch.onmessage = (e) => {
     const now = new Date();
     const rows = [
       {time:'6:50~7:00', round:'—',  label:'몸풀기 퀴즈', who:'박규동', start:[6,50], end:[7,0]},
-      {time:'7:00~7:10', round:'—',  label:'카톡 투표창', who:'박규동', start:[7,0], end:[7,10]},
-      {time:'7:10~7:30', round:'0R', label:'프롤로그', who:'박규동', start:[7,10], end:[7,30]},
-      {time:'7:30~8:00', round:'1R', label:'대통령 선거', who:'박규동 / 홀', start:[7,30], end:[8,0]},
-      {time:'8:00~8:30', round:'2R', label:'주식 거래', who:'박준혁 / 딜러룸', start:[8,0], end:[8,30]},
-      {time:'8:30~9:00', round:'3R', label:'경마', who:'정상린 / 서재', start:[8,30], end:[9,0]},
-      {time:'9:00~9:30', round:'4R', label:'도박장 + 복권', who:'장연우 / 게임룸 · 박규동 / 복도', start:[9,0], end:[9,30]},
-      {time:'9:30~10:00',round:'5R', label:'탄핵 + 정보거래소', who:'박규동 / 거실', start:[9,30], end:[10,0]},
-      {time:'10:00~10:30',round:'6R',label:'후반전 1', who:'전체', start:[10,0], end:[10,30]},
-      {time:'10:30~11:00',round:'7R',label:'후반전 2', who:'전체', start:[10,30], end:[11,0]},
-      {time:'11:00~',    round:'8R', label:'엔딩 (VIP룸 + 오징어게임)', who:'박규동', start:[11,0], end:[25,0]},
+      {time:'7:00~7:10', round:'—',  label:'카톡 투표', who:'박규동', start:[7,0], end:[7,10]},
+      {time:'7:10~7:30', round:'0R+1R', label:'프롤로그 + 대통령 선거', who:'박규동', start:[7,10], end:[7,30]},
+      {time:'7:30~8:00', round:'2R', label:'📈 주식 오픈', who:'박준혁 / 딜러룸', start:[7,30], end:[8,0]},
+      {time:'8:00~8:30', round:'3R', label:'🐎 경마 오픈', who:'정상린 / 서재', start:[8,0], end:[8,30]},
+      {time:'8:30~9:00', round:'4R', label:'🏦 대출 + 🎰 도박장 오픈', who:'장연우 / 게임룸 · 박규동 / 복도', start:[8,30], end:[9,0]},
+      {time:'9:00~9:30', round:'5R', label:'🎫 복권방 오픈', who:'박규동 / 복도', start:[9,0], end:[9,30]},
+      {time:'9:30~10:00',round:'6R', label:'📢 플레이어 출마 가능', who:'전체', start:[9,30], end:[10,0]},
+      {time:'10:00~10:30',round:'7R',label:'🔫 강도 시스템 오픈', who:'전체', start:[10,0], end:[10,30]},
+      {time:'10:30~11:00',round:'8R',label:'⚠️ 마지막 라운드 · 밸런스 조정', who:'박규동', start:[10,30], end:[11,0]},
+      {time:'11:00~',    round:'9R', label:'엔딩 — VIP룸 + 오징어게임', who:'박규동', start:[11,0], end:[25,0]},
     ];
     const h=now.getHours(), m=now.getMinutes();
     const nowMins = h*60+m;
