@@ -770,8 +770,8 @@
 
 
 <!-- ═══ 5라운드 ═══ -->
-<h2>5라운드 — 복권 발매 & 탄핵</h2>
-<p class="h2-sub">운 기반 역전 + 재선거 가능성.</p>
+<h2>5라운드 — 복권 발매</h2>
+<p class="h2-sub">운 기반 역전.</p>
 
 <div class="script-block narration">
   <div class="script-label label-narration">내레이션</div>
@@ -800,33 +800,6 @@
   </div>
 </div>
 
-<div class="script-block narration">
-  <div class="script-label label-narration">내레이션 — 정치 이벤트</div>
-  <div class="script-text">
-    그리고, 국민들에게 한 가지 권리가 주어집니다.
-    <span class="pause"></span>
-    <span class="em">탄핵 투표.</span>
-    <span class="pause"></span>
-    과반수가 찬성하면, 현 대통령은 물러나고
-    <span class="em">새로운 선거</span>가 진행됩니다.
-    <span class="pause"></span>
-    <span class="quiet">이번에는 NPC가 아닌… 플레이어도 출마할 수 있습니다.</span>
-  </div>
-</div>
-
-<div class="script-block system">
-  <div class="script-label label-system">시스템 안내 — 탄핵 투표</div>
-  <div class="script-text">
-    현 대통령을 유지할 것인지 투표합니다.
-    <span class="pause"></span>
-    <span class="em">과반수 탄핵 찬성</span> → 6라운드에 재선거 (플레이어 출마 가능)<br>
-    <span class="em">과반수 유지</span> → 현 정책 계속
-    <span class="pause"></span>
-    출마 비용: <span class="em">20,000원</span>
-  </div>
-</div>
-
-<div class="note">→ 운영자: 탄핵 투표 2분. 결과에 따라 6라운드 시작 시 재선거 or 기존 정책 유지.</div>
 
 
 <!-- ═══ 6라운드~ ═══ -->
@@ -1120,7 +1093,7 @@
   <h4>대통령 선거</h4>
   <ul>
     <li>1라운드: NPC 후보 3명 중 투표</li>
-    <li>5라운드: 탄핵 투표 → 통과 시 재선거 (플레이어 출마 가능)</li>
+    <li>6라운드: 재선거 (플레이어 출마 가능, 출마비 없음)</li>
     <li>투표는 비공개, 다수결. 동률 시 결선 투표.</li>
   </ul>
 </div>
@@ -1308,11 +1281,10 @@
 <h2>특수 규칙</h2>
 
 <div class="rule-card">
-  <h4>탄핵 (5라운드)</h4>
+  <h4>재선거 (6라운드)</h4>
   <ul>
-    <li>5라운드 시작 시 탄핵 투표</li>
-    <li>과반수 찬성 → 6라운드에 재선거</li>
-    <li>플레이어 출마 가능 — 출마비 <strong>20,000원</strong></li>
+    <li>6라운드에 재선거 실시</li>
+    <li>플레이어 출마 가능 — 출마비 <strong>없음 (무료)</strong></li>
     <li>플레이어 대통령은 자신만의 정책 1개 선언 가능 (운영자 승인)</li>
   </ul>
 </div>
@@ -1384,7 +1356,7 @@
   <tr><td>대출 이자</td><td>10%/라운드</td><td>1,000원</td><td>복리</td></tr>
   <tr><td>이체 수수료</td><td>5% (최소 1,000원)</td><td>1,000원</td><td>장연우 당원 면제</td></tr>
   <tr><td>파산 구제금</td><td>20,000원</td><td>-</td><td>1회 한정</td></tr>
-  <tr><td>출마비</td><td>20,000원</td><td>10,000원</td><td>5라운드 이후</td></tr>
+  <tr><td>출마비</td><td>무료</td><td>-</td><td>6라운드</td></tr>
   <tr><td style="color:#ffd700;">VIP 커트라인</td><td style="color:#ffd700;">250,000원</td><td>-</td><td>시작의 2.5배</td></tr>
   <tr><td style="color:#ff2d78;">오징어게임 조건</td><td style="color:#ff2d78;">0원 미만</td><td>-</td><td>빚 > 자산</td></tr>
 </table>
@@ -1462,7 +1434,7 @@
   <tr><td>2</td><td>✅</td><td>-</td><td>-</td><td>-</td><td>✅</td><td>-</td></tr>
   <tr><td>3</td><td>✅</td><td>✅</td><td>-</td><td>-</td><td>✅</td><td>-</td></tr>
   <tr><td>4</td><td>✅</td><td>✅</td><td>✅</td><td>-</td><td>✅</td><td>-</td></tr>
-  <tr><td>5</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>탄핵 투표</td></tr>
+  <tr><td>5</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>-</td></tr>
   <tr><td>6~</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>(재선거)</td></tr>
   <tr style="color:#ffd700;"><td>최종</td><td colspan="6">정산 → VIP룸(250,000원+) / 일반종료 / 오징어게임(마이너스)</td></tr>
 </table>

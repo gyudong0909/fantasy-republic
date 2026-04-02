@@ -390,16 +390,6 @@ label{font-size:11px;color:#666;display:block;margin:6px 0 3px}
     </div>
     <div id="voteDisplay" style="margin-top:12px"></div>
   </div>
-  <div class="card">
-    <h3>탄핵 투표</h3>
-    <div class="form-row">
-      <button class="btn" onclick="addImpeach('keep')">유지 +1</button>
-      <button class="btn" onclick="addImpeach('remove')">탄핵 +1</button>
-      <button class="btn danger" onclick="ST.impeachment={keep:0,remove:0};save();renderVote()">리셋</button>
-      <button class="btn" onclick="sendVoteImpeach()">화면 표시</button>
-    </div>
-    <div id="impeachDisplay" style="margin-top:12px"></div>
-  </div>
 </div>
 
 <!-- ═══ TAB: BETTING ═══ -->
@@ -560,7 +550,6 @@ let ST = {
     '쉴드펀드':{price:20000,history:[20000],sector:'fund'},
   },
   votes:{junhyuk:0,sangrin:0,yeonwoo:0,abstain:0},
-  impeachment:{keep:0,remove:0},
   horseBets:[], horseWinner:0,
   bankLog:[], betLog:[]
 };
@@ -601,6 +590,8 @@ const SCRIPT=[
 {r:'0R+1R — 프롤로그+선거',ri:2,sp:'시스템',c:'sys',h:'대통령 당선 후 즉시 적용:<br>⚔️ 박준혁: 📈 강철방산·쉴드펀드 / 📉 연우랜드·야생동물원<br>🧪 정상린: 📈 연우랜드·토토스포츠 / 📉 용암시장·강철방산<br>🕷️ 장연우: 📈 야생동물원·용암시장 / 📉 토토스포츠·쉴드펀드'},
 {r:'0R+1R — 프롤로그+선거',ri:2,sp:'시스템',c:'sys',h:'📌 <em>모든 재화·아이템은 자유롭게 양도 가능</em><br><br>모든 게임은 라운드 종료 <em>5분 전</em>에 마감됩니다.'},
 // ── 2R 주식 오픈 (7:30~8:00) ──
+{r:'2R — 경제 부흥',ri:3,sp:'내레이션',c:'narr',h:'폐허 위에 세워진 이 나라에도<br>경제가 필요했습니다.<br><br>사람들은 다시 물건을 만들고, 팔고, 사기 시작했습니다.<br><br>그리고 누군가는 말했습니다.<br><em>"돈이 곧 힘이다."</em>'},
+{r:'2R — 경제 부흥',ri:3,sp:'내레이션',c:'narr',h:'6개의 회사가 설립되었습니다.<br><br>시장을 장악한 자, 놀이를 만든 자,<br>스포츠를 되살린 자, 동물을 지킨 자,<br>무기를 만든 자, 그리고 돈을 굴리는 자.<br><br>이제 여러분은 이 회사들에 <em>투자</em>할 수 있습니다.'},
 {r:'2R — 주식 오픈',ri:3,sp:'내레이션',c:'narr',h:'나라가 세워지고, 경제가 필요해졌습니다.<br><br>세 지도자가 키워온 사업들이<br>공식적으로 <em>증권거래소</em>에 상장됩니다.'},
 {r:'2R — 주식 오픈',ri:3,sp:'내레이션',c:'narr',h:'투자에 관심이 많았던 <em>박준혁</em>이<br>자연스럽게 <em>증권거래소</em>를 맡게 됩니다.<br><br><span class="q">"돈이 돌아야 나라가 산다."</span>'},
 {r:'2R — 주식 오픈',ri:3,sp:'시스템',c:'sys',h:'📈 <em>주식 시장 오픈</em><br><br>🏪 <em>용암시장</em> / 🎡 <em>연우랜드</em><br>⚽ <em>토토스포츠</em> / 🦁 <em>야생동물원</em><br>🛡️ <em>강철방산</em> / 💰 <em>쉴드펀드</em><br><br>전부 1주 <em>20,000원</em>'},
@@ -608,6 +599,7 @@ const SCRIPT=[
 {r:'2R — 주식 오픈',ri:3,sp:'시스템',c:'sys',h:'정보거래소: 추가 주식 정보를 <em>돈 주고 구매</em> 가능'},
 {r:'2R — 주식 오픈',ri:3,sp:'시스템',c:'sys',h:'👑 현 대통령 정책:<br>• ⚔️ 박준혁: 📈 강철방산·쉴드펀드 +50% / 📉 연우랜드·야생동물원 -50% · 세금: 상위 1명 징수 → 전원 n빵<br>• 🧪 정상린: 📈 연우랜드·토토스포츠 +50% / 📉 용암시장·강철방산 -50% · 세금: 상위 3명 n빵 → 하위 3명 n빵<br>• 🕷️ 장연우: 📈 야생동물원·용암시장 +50% / 📉 토토스포츠·쉴드펀드 -50% · 세금: 전원 n빵 → 상위 3명 n빵'},
 // ── 3R 경마 오픈 (8:00~8:30) ──
+{r:'3R — 오락의 탄생',ri:4,sp:'내레이션',c:'narr',h:'사람들은 일만 하며 살 수 없었습니다.<br><br>누군가가 말을 길들이기 시작했고,<br>폐허 위에 <em>경마장</em>이 세워졌습니다.<br><br>돈을 걸고, 환호하고, 절망하는…<br>그것이 이 나라의 <em>오락</em>이 되었습니다.'},
 {r:'3R — 경마 오픈',ri:4,sp:'내레이션',c:'narr',h:'국민들에게 돈이 돌기 시작하자,<br>새로운 <em>오락</em>이 탄생했습니다.<br><br>동물원에서 키워온 말들…<br><em>정상린</em>이 야생동물원 옆에 <em>경마장</em>을 세웠습니다.'},
 {r:'3R — 경마 오픈',ri:4,sp:'정상린',c:'sangrin',h:'<span class="q">"일만 하는 나라는 오래 못 간다.<br>이 말들에게도, 사람들에게도 달릴 무대가 필요하다."</span>'},
 {r:'3R — 경마 오픈',ri:4,sp:'시스템',c:'sys',h:'🐎 <em>경마장 오픈</em> — 정상린 / 서재<br><br>8마리 말 (1~8번) · 레일 30칸<br>주사위 굴려서 순차 전진'},
@@ -615,6 +607,7 @@ const SCRIPT=[
 {r:'3R — 경마 오픈',ri:4,sp:'시스템',c:'sys',h:'🎠 <em>말 아이템</em><br><br>• 주사위 2번 굴림 (합산)<br>• 2번 굴려서 높은 쪽<br>• 2번 굴려서 낮은 쪽<br>• 굴린값 +1 전진<br><br>이미 아이템 있는 말에 추가 시 더 비쌈<br><em>대통령이 가격/세율 실시간 조정 가능</em>'},
 {r:'3R — 경마 오픈',ri:4,sp:'시스템',c:'sys',h:'👑 현 대통령 경마 아이템 가격:<br>• ⚔️ 박준혁: +1 20,000원 / -1 15,000원 / 변환 30,000원<br>• 🧪 정상린: +1 10,000원 / -1 30,000원 / 변환 15,000원<br>• 🕷️ 장연우: +1 35,000원 / -1 5,000원 / 변환 50,000원'},
 // ── 4R 대출+도박 오픈 (8:30~9:00) ──
+{r:'4R — 어둠의 확장',ri:5,sp:'내레이션',c:'narr',h:'빛이 있으면 그림자도 있는 법.<br><br>공화국의 뒷골목에<br><em>도박장</em>이 문을 열었습니다.<br><br>그리고 은행은 속삭입니다.<br><em>"돈이 필요하신가요? 빌려드리죠."</em><br><br>물론… 공짜는 아닙니다.'},
 {r:'4R — 대출+도박 오픈',ri:5,sp:'내레이션',c:'narr',h:'경제가 커지자, <em>그림자도 커졌습니다.</em><br><br>수학과 놀이를 사랑하던 <em>장연우</em>…<br>연우랜드 지하에 <em>카지노</em>를 열었습니다.'},
 {r:'4R — 대출+도박 오픈',ri:5,sp:'장연우',c:'yeonwoo',h:'<span class="q">"놀이공원에서 웃음을 팔았다면,<br>여기서는 운명을 판다."</span>'},
 {r:'4R — 대출+도박 오픈',ri:5,sp:'내레이션',c:'narr',h:'동시에 시스템이 <em>은행</em>을 개설했습니다.<br><br>돈을 맡길 수 있고, 빌릴 수도 있습니다.<br>하지만…<br><br><em>맡긴 돈이 정말 안전할까요?</em>'},
@@ -622,22 +615,27 @@ const SCRIPT=[
 {r:'4R — 대출+도박 오픈',ri:5,sp:'시스템',c:'sys',h:'🎰 <em>도박장 오픈</em> — 장연우 / 게임룸<br><br>종목: <em>블랙잭 / 바카라 / 룰렛</em><br>대통령에 따라 종목 + 세율이 결정됩니다.'},
 {r:'4R — 대출+도박 오픈',ri:5,sp:'시스템',c:'sys',h:'👑 현 대통령 정책:<br>• ⚔️ 박준혁: 🎰 블랙잭 (세율 High) · 💰 대출 선이자 20%<br>• 🧪 정상린: 🎰 룰렛 (세율 Middle) · 💰 대출 선이자 10%<br>• 🕷️ 장연우: 🎰 바카라 (세율 Low) · 💰 대출 선이자 30%'},
 // ── 5R 복권방 오픈 (9:00~9:30) ──
+{r:'5R — 희망의 판매',ri:6,sp:'내레이션',c:'narr',h:'가진 것이 없는 자들에게도<br>희망은 필요했습니다.<br><br>단돈 <em>1,000원</em>에 인생이 바뀔 수 있다면?<br><br>복권방이 열렸습니다.<br>누군가는 웃을 것이고,<br>대부분은 웃지 못할 것입니다.'},
 {r:'5R — 복권방 오픈',ri:6,sp:'내레이션',c:'narr',h:'부자와 빈자의 격차가 벌어지기 시작합니다.<br><br>시스템은 가난한 자에게도 기회를 주기 위해<br><em>복권방</em>을 열었습니다.'},
 {r:'5R — 복권방 오픈',ri:6,sp:'시스템 관리자',c:'narr',h:'<span class="q">"가진 것이 없어도 희망은 살 수 있습니다.<br>1,000원이면 됩니다."</span>'},
 {r:'5R — 복권방 오픈',ri:6,sp:'시스템',c:'sys',h:'🎫 <em>복권방 오픈</em> — 시스템 관리자 / 복도<br><br>• 1장 <em>1,000원</em><br>• 트럼프카드 52장 중 <em>6개 맞추기</em><br>• 매 라운드 끝나고 결과 발표<br><br>2개: 0배 / 3개: <em>25배</em> / 4개: <em>325배</em><br>5개: <em>2,000배</em> / 6개: <em>50,000배</em>'},
 {r:'5R — 복권방 오픈',ri:6,sp:'시스템',c:'sys',h:'👑 현 대통령 복권 배수:<br>• ⚔️ 박준혁: <em>Low</em> (당첨금 최소)<br>• 🧪 정상린: <em>Middle</em> (보통)<br>• 🕷️ 장연우: <em>High</em> (당첨금 최대)'},
 // ── 6R 혁명 (9:30~10:00) ──
-{r:'6R — 혁명',ri:7,sp:'내레이션',c:'narr',h:'시간이 흐르고…<br><br>초대 지도자들의 시대가 저물어갑니다.<br><br>국민들 사이에서 목소리가 커집니다.<br><em>"우리도 이끌 수 있다."</em>'},
-{r:'6R — 혁명',ri:7,sp:'내레이션',c:'narr',h:'<em>세대교체.</em><br><br>기존 정당이 <em>전부 해산</em>됩니다.<br>NPC 대통령의 시대가 끝났습니다.<br><br>이제, <em>국민 누구든</em> 대통령이 될 수 있습니다.'},
-{r:'6R — 혁명',ri:7,sp:'시스템',c:'sys',h:'📌 <em>플레이어 대통령 권한</em><br><br>• 주식: <em>오를 것 2개 + 내릴 것 2개</em> 즉시 선택<br>• 도박: 종목 변경 + 보상률 조정<br>• 경마: 아이템 가격 조정<br>• 복권: 배수 조정<br>• 플레이어 <em>은행 자금 현황 열람</em><br><br>⚠️ 경제활동 전면 금지 · 강도 불가 · 월급 없음'},
-{r:'6R — 혁명',ri:7,sp:'시스템',c:'sys',h:'투표 진행',m:'→ 투표'},
+{r:'6R — 혁명',ri:7,sp:'내레이션',c:'narr',h:'이 나라를 이끌어 온 <em>세 명의 장로</em>가 있었습니다.<br><br>박준혁, 정상린, 장연우.<br><br>그들은 혼란 속에서 질서를 세우고,<br>이 공화국의 기틀을 다졌습니다.'},
+{r:'6R — 혁명',ri:7,sp:'내레이션',c:'narr',h:'그러나… 시대는 변합니다.<br><br>장로들은 스스로 자리에서 물러났고,<br>그들이 이끌던 <em>정당은 해체</em>되었습니다.<br><br>더 이상 당원 혜택은 없습니다.'},
+{r:'6R — 혁명',ri:7,sp:'내레이션',c:'narr',h:'이제 이 나라는 <em>새로운 지도자</em>를 원합니다.<br><br>장로가 아닌, <em>국민 중 한 명</em>이<br>이 공화국을 이끌 차례입니다.<br><br><em>"누구든 대통령이 될 수 있습니다."</em>'},
+{r:'6R — 혁명',ri:7,sp:'시스템',c:'sys',h:'📌 <em>대통령이 할 수 있는 것</em><br><br>📈 <em>주식</em>: 오를 것 2개 (+50%) + 내릴 것 2개 (-50%) 즉시 적용<br>🎰 <em>도박</em>: 종목 선택 (블랙잭/바카라/룰렛) + 세율 (High/Mid/Low)<br>🏇 <em>경마</em>: 아이템 가격 조정 (범위 내)<br>💰 <em>대출</em>: 선이자율 설정 (10%/20%/30%)<br>🎫 <em>복권</em>: 배수 등급 설정 (Low/Mid/High)<br>💸 <em>세금/보상</em>: 징수 대상 + 보상 대상 자유 설정<br>👁️ <em>정보</em>: 전체 플레이어 은행 자금 현황 열람'},
+{r:'6R — 혁명',ri:7,sp:'시스템',c:'sys',h:'⚠️ <em>대통령의 제약</em><br><br>❌ 경제활동 <em>전면 금지</em> (주식/도박/경마/복권 참여 불가)<br>❌ 강도 불가 · 용의선상 불가 · 지목 불가<br>❌ 월급 없음<br><br>대통령은 <em>권한으로 판을 흔드는 역할</em>입니다.<br>직접 돈을 벌 수는 없습니다.'},
+{r:'6R — 혁명',ri:7,sp:'시스템',c:'sys',h:'🗳️ <em>대통령 선거</em><br><br>출마를 원하는 사람은 지금 선언하세요.<br>출마비는 없습니다.<br><br>투표로 결정됩니다.',m:'→ 플레이어 대통령 투표 진행'},
 // ── 7R 혼돈 (10:00~10:30) ──
+{r:'7R — 혼돈',ri:8,sp:'내레이션',c:'narr',h:'부의 격차는 점점 벌어졌습니다.<br><br>가진 자는 더 가지려 하고,<br>잃은 자는 되찾으려 합니다.<br><br>그리고 마침내…<br>이 나라에서 <em>강도</em>가 합법화되었습니다.<br><br><em>"당신의 금고는 안전하지 않습니다."</em>'},
 {r:'7R — 혼돈',ri:8,sp:'내레이션',c:'narr',h:'권력이 바뀌자, 질서가 흔들립니다.<br><br>빈부의 격차가 드러나고…<br>어둠 속에서 <em>새로운 직업</em>이 등장합니다.'},
 {r:'7R — 혼돈',ri:8,sp:'시스템',c:'sys',h:'📊 <em>플레이어 평균 자산 공개</em>',m:'→ 순위표 표시'},
 {r:'7R — 혼돈',ri:8,sp:'내레이션',c:'narr',h:'은행에 돈을 맡겨둔 자들이여.<br><br><em>잠겨 있다고 안전한 것은 아닙니다.</em>'},
 {r:'7R — 혼돈',ri:8,sp:'시스템',c:'sys',h:'🔫 <em>강도 시스템 오픈</em><br><br>은행 예금을 노릴 수 있습니다.<br><span class="rub">대통령은 강도 불가 · 지목 불가 · 용의선상 불가 (완전 면제)</span>'},
-{r:'7R — 혼돈',ri:8,sp:'시스템',c:'sys',h:'📌 <em>강도 규칙</em><br><br>1. 은행에서 대상 지정 → 예금 전부를 노림<br>2. 나 제외 <em>n명</em>을 용의선상에 추가 (위장)<br>3. 피해자는 <em>m번</em> 기회 안에 범인 찍기<br>4. 맞추면 돈 지킴 · 못 맞추면 뺏김<br><br>강도 비용: <em>(n-m)/n × 예금액</em> 이상<br>부족하면 은행에 회수 (돈 날림)'},
+{r:'7R — 혼돈',ri:8,sp:'시스템',c:'sys',h:'📌 <em>강도 규칙</em><br><br>1. 은행에서 대상 지정 → 예금 전부를 노림<br>2. 나 제외 <em>n명</em>을 용의선상에 추가 (위장)<br>3. 피해자는 <em>m번</em> 기회 안에 범인 찍기<br>4. 맞추면 돈 지킴 · 못 맞추면 뺏김<br><br>⚠️ 강도 비용: <em>선불</em> (시도 전에 지불)<br>금액: <em>(n-m)/n × 대상 예금액</em> 이상<br>❌ 실패해도 비용은 돌려받지 못함'},
 // ── 8R 심판 (10:30~11:00) ──
+{r:'8R — 심판',ri:9,sp:'내레이션',c:'narr',h:'모든 것에는 끝이 있습니다.<br><br>시장이 닫히고, 도박장의 불이 꺼지고,<br>경마장에 더 이상 말이 달리지 않습니다.<br><br>이제 남은 것은 단 하나.<br><em>당신은 얼마를 가지고 있습니까?</em>'},
 {r:'8R — 심판',ri:9,sp:'내레이션',c:'narr',h:'모든 것이 끝을 향해 달려가고 있습니다.<br><br>이것이… <em>마지막 기회</em>입니다.'},
 {r:'8R — 심판',ri:9,sp:'내레이션',c:'narr',h:'이 공화국에서 충분한 부를 쌓은 자는<br><em>엔젤</em>이 되어 새로운 세계로 갑니다.<br><br>그러나 빚에 빠진 자는…<br><em>데블</em>로서 대가를 치러야 합니다.'},
 {r:'8R — 심판',ri:9,sp:'시스템',c:'sys',h:'😇 <em>엔젤 진출</em>: 순자산 <em>200,000원 이상</em><br>😈 <em>데블 진출</em>: 순자산 <em>마이너스</em>',m:'→ 밸런스 조정 공지'},
@@ -1158,21 +1156,14 @@ function sendStocks(){
 // ═══════════════════════════════════════════
 function addVote(k){ST.votes[k]++;save();renderVote()}
 function resetVotes(){ST.votes={junhyuk:0,sangrin:0,yeonwoo:0,abstain:0};save();renderVote()}
-function addImpeach(k){ST.impeachment[k]++;save();renderVote()}
 function renderVote(){
   const t=ST.votes.junhyuk+ST.votes.sangrin+ST.votes.yeonwoo+ST.votes.abstain||1;
   const vd=document.getElementById('voteDisplay');
   vd.innerHTML=[['⚔️ 박준혁',ST.votes.junhyuk,'#6ab0ff'],['🧪 정상린',ST.votes.sangrin,'#6aff9a'],['🕷️ 장연우',ST.votes.yeonwoo,'#d06aff'],['기권',ST.votes.abstain,'#555']].map(([n,c,col])=>`<div class="form-row" style="margin:4px 0"><span style="width:80px;font-size:12px">${n}</span><div class="vote-bar-o"><div class="vote-bar-i" style="width:${c/t*100}%;background:${col}"></div></div><span style="width:40px;text-align:right;font-weight:700">${c}</span></div>`).join('');
-  const it=ST.impeachment.keep+ST.impeachment.remove||1;
-  document.getElementById('impeachDisplay').innerHTML=[['유지',ST.impeachment.keep,'#6aff9a'],['탄핵',ST.impeachment.remove,'#ff4444']].map(([n,c,col])=>`<div class="form-row" style="margin:4px 0"><span style="width:60px;font-size:12px">${n}</span><div class="vote-bar-o"><div class="vote-bar-i" style="width:${c/it*100}%;background:${col}"></div></div><span style="width:40px;text-align:right;font-weight:700">${c}</span></div>`).join('');
 }
 function sendVoteElection(){
   ch.postMessage({type:'vote',data:{title:'초대 대통령 선거',candidates:[{name:'박준혁',count:ST.votes.junhyuk},{name:'정상린',count:ST.votes.sangrin},{name:'장연우',count:ST.votes.yeonwoo},{name:'기권',count:ST.votes.abstain}]}});
 }
-function sendVoteImpeach(){
-  ch.postMessage({type:'vote',data:{title:'탄핵 투표',candidates:[{name:'유지',count:ST.impeachment.keep},{name:'탄핵',count:ST.impeachment.remove}]}});
-}
-
 // ═══════════════════════════════════════════
 // [10] BETTING
 // ═══════════════════════════════════════════
