@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>판타지 공화국 — 대본</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #0a0a0f; color: #e0e0e0;
+      line-height: 1.8;
+    }
+
+    /* 상단 바 */
+    .top-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,10,15,0.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid #1a1a2e;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 20px; height: 50px;
+    }
+    .top-bar .logo { font-weight: 900; font-size: 14px; color: #f0c040; }
+    .top-bar .round-tabs {
+      display: flex; gap: 4px; overflow-x: auto;
+    }
+    .round-tab {
+      color: #444; font-size: 11px; font-weight: 700;
+      padding: 4px 10px; border-radius: 16px; cursor: pointer;
+      white-space: nowrap; transition: all 0.3s; border: none; background: none;
+    }
+    .round-tab:hover { color: #888; }
+    .round-tab.active { color: #f0c040; background: rgba(240,192,64,0.1); }
+    .top-bar .back-link {
+      color: #555; text-decoration: none; font-size: 11px;
+      padding: 4px 10px; border-radius: 16px;
+    }
+    .top-bar .back-link:hover { color: #f0c040; }
+
+    /* 슬라이드 컨테이너 */
+    .slide-container {
+      position: fixed; top: 50px; bottom: 60px; left: 0; right: 0;
+      overflow-y: auto; overflow-x: hidden;
+    }
+    .slide {
+      display: none; max-width: 760px; margin: 0 auto;
+      padding: 32px 24px 40px; min-height: 100%;
+    }
+    .slide.active { display: block; }
+
+    /* 하단 네비게이션 */
+    .bottom-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,10,15,0.95); backdrop-filter: blur(12px);
+      border-top: 1px solid #1a1a2e;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 24px; height: 60px;
+    }
+    .nav-btn {
+      background: none; border: 1px solid #333; color: #888;
+      padding: 8px 20px; border-radius: 8px; font-size: 13px;
+      cursor: pointer; font-family: inherit; transition: all 0.3s;
+    }
+    .nav-btn:hover { border-color: #f0c040; color: #f0c040; }
+    .nav-btn:disabled { opacity: 0.2; cursor: default; }
+    .page-indicator { color: #444; font-size: 12px; font-weight: 700; }
+
+    /* 라운드 헤더 */
+    .round-header { margin-bottom: 24px; }
+    .round-num {
+      font-size: 11px; font-weight: 900; color: #f0c040;
+      background: rgba(240,192,64,0.1); padding: 3px 10px;
+      border-radius: 20px; display: inline-block; margin-bottom: 6px;
+    }
+    .round-title { font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 4px; }
+    .round-sub { font-size: 13px; color: #555; }
+
+    /* 대사 블록 */
+    .line {
+      margin: 20px 0; padding: 20px 24px;
+      background: #0e0e18; border-radius: 12px;
+      border-left: 3px solid #333;
+    }
+    .line.narr { border-left-color: #f0c040; }
+    .line.sys { border-left-color: #6ab0ff; }
+    .line.dir { border-left-color: #444; }
+    .line.junhyuk { border-left-color: #6ab0ff; }
+    .line.sangrin { border-left-color: #6aff9a; }
+    .line.yeonwoo { border-left-color: #d06aff; }
+    .line.vip { border-left-color: #ffd700; }
+    .line.squid { border-left-color: #ff2d78; }
+
+    .speaker {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+      margin-bottom: 8px; text-transform: uppercase;
+    }
+    .speaker.narr { color: #f0c040; }
+    .speaker.sys { color: #6ab0ff; }
+    .speaker.dir { color: #555; }
+    .speaker.junhyuk { color: #6ab0ff; }
+    .speaker.sangrin { color: #6aff9a; }
+    .speaker.yeonwoo { color: #d06aff; }
+    .speaker.vip { color: #ffd700; }
+    .speaker.squid { color: #ff2d78; }
+
+    .text { font-size: 15px; color: #ddd; }
+    .text em { font-style: normal; color: #f0c040; font-weight: 700; }
+    .text .q { color: #888; font-style: italic; }
+    .text .b { display: block; height: 10px; } /* beat/pause */
+
+    /* 운영 메모 */
+    .memo {
+      font-size: 12px; color: #444; margin: 4px 0 0 28px;
+      padding-left: 12px; border-left: 2px solid #1e1e30;
+    }
+
+    /* 서브 헤딩 */
+    .sub-heading {
+      font-size: 14px; font-weight: 700; color: #888;
+      margin: 32px 0 12px;
+    }
+
+    .footer-text { text-align: center; padding: 24px; color: #222; font-size: 11px; }
+
+    /* 키보드 힌트 */
+    .key-hint {
+      position: fixed; bottom: 68px; right: 24px;
+      color: #333; font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 상단 -->
+<div class="top-bar">
+  <span class="logo">판타지 공화국 — 대본</span>
+  <div class="round-tabs">
+    <button class="round-tab active" onclick="goSlide(0)">프롤로그</button>
+    <button class="round-tab" onclick="goSlide(1)">1R 선거</button>
+    <button class="round-tab" onclick="goSlide(2)">2R 주식</button>
+    <button class="round-tab" onclick="goSlide(3)">3R 경마</button>
+    <button class="round-tab" onclick="goSlide(4)">4R 도박</button>
+    <button class="round-tab" onclick="goSlide(5)">5R 탄핵</button>
+    <button class="round-tab" onclick="goSlide(6)">6R~ 후반</button>
+    <button class="round-tab" onclick="goSlide(7)">최종</button>
+  </div>
+  <a href="index.html" class="back-link">← 메인</a>
+</div>
+
+<!-- 슬라이드 영역 -->
+<div class="slide-container">
+
+<!-- ===== SLIDE 0: 프롤로그 ===== -->
+<div class="slide active" data-index="0">
+
+
+<!-- ═══════════════════════════════════════ -->
+<!--              0라운드: 프롤로그            -->
+<!-- ═══════════════════════════════════════ -->
+<div class="round-header" id="r0">
+  <span class="round-num">0라운드</span>
+  <div class="round-title">프롤로그</div>
+  <div class="round-sub">세계관 소개 + 초기 자금 지급</div>
+</div>
+
+<div class="line dir">
+  <div class="speaker dir">연출</div>
+  <div class="text">화면: 무너진 도시. 먼지와 잿더미. BGM: 낮고 무거운 앰비언트.</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    세계는… <em>멸망했습니다.</em>
+    <span class="b"></span>
+    국가는 붕괴했고, 질서는 사라졌으며, 법은 더 이상 존재하지 않습니다.
+  </div>
+</div>
+
+<div class="line dir">
+  <div class="speaker dir">연출</div>
+  <div class="text">폭발 흔적, 붕괴된 건물, 버려진 차량. 3초 정적. 바람 소리.</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    하지만…
+    <span class="b"></span>
+    <em>인류는 멸망하지 않았습니다.</em>
+    <span class="b"></span>
+    여러분은, 그 마지막 생존자들입니다.
+  </div>
+</div>
+
+<div class="line dir">
+  <div class="speaker dir">연출</div>
+  <div class="text">사람들이 모여 있는 장면. 깃발이 세워진다. 도시가 재건되는 모습. BGM 고조.</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    그리고 지금, 여러분은 새로운 국가에 입장합니다.
+  </div>
+</div>
+
+<div class="line dir">
+  <div class="speaker dir">연출</div>
+  <div class="text">거대한 문이 열린다. 타이틀 "판타지 공화국" 등장.</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    이곳은 <em>판타지 공화국.</em>
+    <span class="b"></span>
+    이 나라에는 왕이 없습니다.
+    지배자도, 정해진 규칙도 없습니다.
+    <span class="b"></span>
+    오직 하나만 존재합니다.
+    <span class="b"></span>
+    <em>돈.</em>
+    <span class="b"></span>
+    이곳에서 돈은 단순한 자원이 아닙니다.
+    <em>생존이며, 기회이며, 권력입니다.</em>
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템</div>
+  <div class="text">
+    여러분은 전부 <em>100,000원</em>을 가지고 게임을 시작합니다.
+  </div>
+</div>
+<div class="memo">→ 각 플레이어에게 100,000원 현금 배분</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    여러분은 선택해야 합니다.
+    협력할 것인지, 속일 것인지, 지배할 것인지.
+    <span class="b"></span>
+    그리고… 이 나라의 <em>첫 번째 규칙</em>을 정할 시간입니다.
+    <span class="b"></span>
+    <em>누가 이 공화국을 이끌 것인가.</em>
+  </div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    그리고 한 가지 더.
+    <span class="b"></span>
+    이 게임의 끝에서, 여러분은 세 갈래 길 앞에 서게 됩니다.
+    <span class="b"></span>
+    <em>250,000원</em> 이상을 모은 자는 —
+    <em>VIP룸</em>에 초대됩니다. 승자들만의 최종 게임.
+    <span class="b"></span>
+    하지만 빚더미에 빠져 순자산이 <em>마이너스</em>가 된 자는 —
+    <span class="q">…오징어 게임에 진출하게 됩니다.</span>
+    <span class="b"></span>
+    당신의 선택이 어느 문으로 이끌지… 지켜보겠습니다.
+  </div>
+</div>
+
+
+</div><!-- /slide 0 -->
+
+<!-- ===== SLIDE 1: 선거 ===== -->
+<div class="slide" data-index="1">
+<div class="round-header" id="r1">
+  <span class="round-num">1라운드</span>
+  <div class="round-title">대통령 선거</div>
+  <div class="round-sub">후보 공개 → 당원 가입 → 투표 → 당선 발표</div>
+</div>
+
+<div class="sub-heading">1-1. 후보 공개</div>
+
+<div class="line dir">
+  <div class="speaker dir">연출</div>
+  <div class="text">3명의 실루엣이 등장. 하나씩 밝혀진다. 긴장감 있는 BGM.</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    인류를 지켜낸 세 명의 지도자가 있습니다.
+    그들은 각자의 방식으로 이 나라를 바꾸려 합니다.
+    <span class="b"></span>
+    곧, 세 명의 후보가 공개됩니다.
+  </div>
+</div>
+
+<div class="line junhyuk">
+  <div class="speaker junhyuk">후보 1 — 박준혁</div>
+  <div class="text">
+    <em>⚔️ 박준혁 — 강철방위당</em>
+    <span class="b"></span>
+    <span class="q">"질서 없는 자유는 혼돈일 뿐이다."</span>
+    <span class="b"></span>
+    멸망 이전, 그는 군 기갑부대의 지휘관이었습니다.
+    문명이 무너진 날, 그는 군용마 부대를 이끌고 생존자들을 구출했습니다.
+    <span class="b"></span>
+    그는 강력한 질서와 국방을 약속합니다.
+    세금을 걷되, 능력 있는 자에게 보상을 돌려주겠다고 말합니다.
+    <span class="b"></span>
+    — 모든 국민에게 <em>국방세 5,000원</em> 부과<br>
+    — 매 라운드 수익 1위에게 <em>보너스 10,000원</em><br>
+    — 시장, 놀이 산업 성장
+  </div>
+</div>
+
+<div class="line sangrin">
+  <div class="speaker sangrin">후보 2 — 정상린</div>
+  <div class="text">
+    <em>🧪 정상린 — 혁신개발당</em>
+    <span class="b"></span>
+    <span class="q">"성장은 선택이 아니라 필수다."</span>
+    <span class="b"></span>
+    멸망 이전, 그는 국가 데이터센터의 수석 연구원이었습니다.
+    세상이 무너질 때, 그는 핵심 서버를 지켜냈고, 그 정보는 재건의 열쇠가 되었습니다.
+    <span class="b"></span>
+    그는 기술과 정보의 힘을 믿습니다.
+    위험하더라도 성장해야 한다고 말합니다.
+    <span class="b"></span>
+    — 모든 회사 <em>변동폭 ×1.5배</em> (수익도 크고 손실도 큼)<br>
+    — 당원에게 <em>추가 정보 카드</em> 제공<br>
+    — 스포츠, 동물원 산업 성장
+  </div>
+</div>
+
+<div class="line yeonwoo">
+  <div class="speaker yeonwoo">후보 3 — 장연우</div>
+  <div class="text">
+    <em>🕷️ 장연우 — 암흑이익당</em>
+    <span class="b"></span>
+    <span class="q">"누군가 잃어야, 누군가는 얻는다."</span>
+    <span class="b"></span>
+    멸망 이전, 그의 과거를 아는 사람은 없습니다.
+    다만 혼란 속에서 그가 가장 먼저 한 일은 — 지하 벙커에 카지노를 연 것이었습니다.
+    절망한 사람들이 마지막 희망을 걸고 모여들었고, 그는 그 위에 제국을 세웠습니다.
+    <span class="b"></span>
+    그는 부의 재분배를 약속합니다.
+    하지만 그 이면에는… 약탈의 논리가 숨어 있습니다.
+    <span class="b"></span>
+    — 매 라운드 자산 1위에게서 순자산의 <em>10% 회수</em><br>
+    — 회수된 금액을 전원에게 <em>균등 분배</em><br>
+    — 방산, 펀드 산업 성장
+  </div>
+</div>
+
+<div class="sub-heading">1-2. 당원 가입</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템</div>
+  <div class="text">
+    이제, <em>당원 가입</em>이 시작됩니다.
+    <span class="b"></span>
+    참여할 당을 선택하거나, 무소속으로 남으십시오.
+    <span class="b"></span>
+    당에 가입하려면 <em>10,000원</em>이 필요합니다.
+    가입하지 않아도 게임 참여에는 문제가 없습니다.
+    <span class="b"></span>
+    <span class="q">소속 당의 후보가 당선되면 <em>정보 카드 2장</em>이 보상으로 지급됩니다.</span>
+  </div>
+</div>
+<div class="memo">→ 가입 시간 3분. 가입자 10,000원 회수. 당원 명단 기록.</div>
+
+<div class="sub-heading">1-3. 투표</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    당원 가입이 종료되었습니다.
+    <span class="b"></span>
+    지금부터, 이 나라의 <em>초대 대통령 선거</em>가 진행됩니다.
+    <span class="b"></span>
+    당신의 선택이, 이 나라의 첫 번째 권력을 결정합니다.
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템</div>
+  <div class="text">
+    세 후보 중 한 명에게 투표하십시오.
+    무소속도 투표 가능. 기권 가능.
+    <span class="b"></span>
+    투표는 <em>비공개</em>로 진행됩니다.
+  </div>
+</div>
+<div class="memo">→ 투표 시간 2분. 종이 투표 or 화면 투표. 집계 후 결과 발표.</div>
+
+<div class="sub-heading">1-4. 당선 발표</div>
+
+<div class="line dir">
+  <div class="speaker dir">연출</div>
+  <div class="text">투표 결과 바 애니메이션. 드럼롤. 당선자 이미지 크게.</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    투표가 종료되었습니다.
+    <span class="b"></span>
+    판타지 공화국의 초대 대통령은…
+    <span class="b"></span>
+    <em>[당선자 이름]</em>입니다.
+  </div>
+</div>
+
+<div class="line junhyuk">
+  <div class="speaker junhyuk">박준혁 당선 시</div>
+  <div class="text">
+    <span class="q">"질서가 세워졌습니다."</span>
+    <span class="b"></span>
+    박준혁 대통령의 정책이 시행됩니다.<br>
+    — 전원 <em>국방세 5,000원</em> 부과<br>
+    — 수익 1위에게 <em>보너스 10,000원</em><br>
+    — 시장, 놀이 산업 성장
+  </div>
+</div>
+
+<div class="line sangrin">
+  <div class="speaker sangrin">정상린 당선 시</div>
+  <div class="text">
+    <span class="q">"성장의 시대가 시작됩니다."</span>
+    <span class="b"></span>
+    정상린 대통령의 정책이 시행됩니다.<br>
+    — 모든 회사 <em>변동폭 ×1.5배</em><br>
+    — 당원에게 <em>추가 정보 카드</em> 제공<br>
+    — 스포츠, 동물원 산업 성장
+  </div>
+</div>
+
+<div class="line yeonwoo">
+  <div class="speaker yeonwoo">장연우 당선 시</div>
+  <div class="text">
+    <span class="q">"재분배의 시대가 열렸습니다."</span>
+    <span class="b"></span>
+    장연우 대통령의 정책이 시행됩니다.<br>
+    — 자산 1위에게서 순자산의 <em>10%</em> 회수<br>
+    — 전원에게 <em>균등 분배</em><br>
+    — 방산, 펀드 산업 성장
+  </div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    대통령이 결정되었습니다.
+    이제, 이 나라에 <em>경제</em>가 시작됩니다.
+    <span class="b"></span>
+    다음 라운드부터, 여러분은 <em>회사에 투자</em>할 수 있습니다.
+    정보를 모으고, 판단하고, 돈을 굴리십시오.
+  </div>
+</div>
+
+
+</div><!-- /slide 1 -->
+
+<!-- ===== SLIDE 2: 주식 ===== -->
+<div class="slide" data-index="2">
+<div class="round-header" id="r2">
+  <span class="round-num">2라운드</span>
+  <div class="round-title">경제 시작 — 주식 투자</div>
+  <div class="round-sub">회사 공개 → 정보 카드 → 투자 → 결산</div>
+</div>
+
+<div class="sub-heading">2-1. 회사 공개</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    판타지 공화국에 <em>6개의 회사</em>가 설립되었습니다.
+    <span class="b"></span>
+    각 회사는 서로 다른 산업에 속해 있으며,
+    대통령의 정책에 따라 성장하거나 쇠퇴합니다.
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템 — 회사 목록</div>
+  <div class="text">
+    🏪 <em>용암시장</em> — 시장 / 1주 <em>20,000원</em><br>
+    🎡 <em>연우랜드</em> — 놀이 / 1주 <em>20,000원</em><br>
+    ⚽ <em>토토스포츠</em> — 스포츠 / 1주 <em>20,000원</em><br>
+    🦁 <em>야생동물원</em> — 동물원 / 1주 <em>20,000원</em><br>
+    🛡️ <em>강철방산</em> — 방산 / 1주 <em>20,000원</em><br>
+    💰 <em>쉴드펀드</em> — 펀드 / 1주 <em>20,000원</em>
+    <span class="b"></span>
+    <span class="q">모든 구매는 10,000원 단위. 매수 수수료 1,000원/건.</span>
+  </div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    모든 회사는 현재 <em>주당 20,000원</em>입니다.
+    <span class="b"></span>
+    하지만 다음 라운드에는… 누군가는 오르고, 누군가는 떨어집니다.
+    <span class="b"></span>
+    <em>어떤 회사가 오를지는 — 정보에 달려 있습니다.</em>
+  </div>
+</div>
+
+<div class="sub-heading">2-2. 정보 카드</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템</div>
+  <div class="text">
+    각 플레이어에게 <em>정보 카드 1장</em>이 비공개로 지급됩니다.
+    <span class="b"></span>
+    카드에는 특정 회사의 다음 라운드 가격 변동 힌트가 적혀 있습니다.
+    <span class="b"></span>
+    <span class="q">주의: 모든 정보가 정확한 것은 아닙니다.</span>
+    일부 카드는 <em>불완전하거나 거짓</em>일 수 있습니다.
+    <span class="b"></span>
+    정보를 다른 플레이어와 <em>공유, 거래, 또는 거짓말</em>할 수 있습니다.
+  </div>
+</div>
+<div class="memo">→ 정보 카드 1인 1장 배분. 정확 70% / 거짓 30%.</div>
+
+<div class="sub-heading">2-3. 자유 시간</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템</div>
+  <div class="text">
+    지금부터 <em>5분간</em> 자유 시간입니다.
+    <span class="b"></span>
+    — 다른 플레이어와 <em>정보를 교환</em>할 수 있습니다<br>
+    — 회사 주식을 <em>매수</em>할 수 있습니다 (10,000원 단위)<br>
+    — 은행에서 <em>대출</em>을 받을 수 있습니다
+    <span class="b"></span>
+    <span class="q">운영자 데스크에서 "○○ 회사 ○주 매수" 형태로 신청.</span>
+  </div>
+</div>
+<div class="memo">→ 5분 타이머. 매수/매도 처리. 시스템 기록.</div>
+
+<div class="sub-heading">2-4. 결산</div>
+
+<div class="line dir">
+  <div class="speaker dir">연출</div>
+  <div class="text">타이머 종료. 주가 변동 차트가 화면에 표시된다.</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    투자 시간이 종료되었습니다.
+    지금부터 이번 라운드의 <em>시장 결과</em>를 발표합니다.
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템 — 가격 변동</div>
+  <div class="text">
+    🏪 용암시장: 20,000원 → <em>[변동가]</em><br>
+    🎡 연우랜드: 20,000원 → <em>[변동가]</em><br>
+    ⚽ 토토스포츠: 20,000원 → <em>[변동가]</em><br>
+    🦁 야생동물원: 20,000원 → <em>[변동가]</em><br>
+    🛡️ 강철방산: 20,000원 → <em>[변동가]</em><br>
+    💰 쉴드펀드: 20,000원 → <em>[변동가]</em>
+  </div>
+</div>
+<div class="memo">→ 미리 정한 변동표 적용. 대통령 정책 보정 반영. 자산 재계산.</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템 — 정책 적용</div>
+  <div class="text">
+    <span class="q">(당선자에 따라 해당 항목만 읽기)</span>
+    <span class="b"></span>
+    ⚔️ 박준혁: 전원 국방세 <em>5,000원</em> 징수. 수익 1위 <em>보너스 10,000원</em>.<br>
+    🧪 정상린: 당원에게 추가 정보 카드 1장.<br>
+    🕷️ 장연우: 자산 1위에게서 <em>10%</em> 회수 → 전원 분배.
+  </div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    2라운드가 종료되었습니다.
+    <span class="q">현재 순위가 화면에 표시됩니다.</span>
+    <span class="b"></span>
+    다음 라운드에는 새로운 기회가 열립니다.
+  </div>
+</div>
+
+
+</div><!-- /slide 2 -->
+
+<!-- ===== SLIDE 3: 경마 ===== -->
+<div class="slide" data-index="3">
+<div class="round-header" id="r3">
+  <span class="round-num">3라운드</span>
+  <div class="round-title">경마장 오픈</div>
+  <div class="round-sub">박준혁의 경마장. 주식 + 경마.</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    판타지 공화국에 새로운 시설이 문을 열었습니다.
+    <span class="b"></span>
+    강철방위당의 <em>박준혁</em>이 군용마 훈련장을 개조하여
+    이 나라 최초의 <em>경마장</em>을 세웠습니다.
+    <span class="b"></span>
+    <span class="q">"말은 전쟁터에서만 달리는 게 아니다."</span>
+    <span class="b"></span>
+    빠른 돈을 원하는 자에게 기회가 주어집니다.
+    하지만 잃는 것도 빠를 것입니다.
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템 — 경마</div>
+  <div class="text">
+    경마에는 <em>4마리의 말</em>이 출전합니다.
+    <span class="b"></span>
+    🐎 1번 말 — 배당 <em>×2</em> (승률 높음)<br>
+    🐎 2번 말 — 배당 <em>×3</em><br>
+    🐎 3번 말 — 배당 <em>×5</em><br>
+    🐎 4번 말 — 배당 <em>×10</em> (승률 낮음)
+    <span class="b"></span>
+    베팅: 최소 <em>10,000원</em> / 최대 <em>20,000원</em>
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">3라운드 진행</div>
+  <div class="text">
+    1. 정보 카드 배분 (1인 1장)<br>
+    2. 자유 시간 5분 — 주식 + 정보 교환 + 경마 베팅<br>
+    3. 경마 결과 발표<br>
+    4. 주가 변동 발표<br>
+    5. 대통령 정책 적용<br>
+    6. 순위 발표
+  </div>
+</div>
+
+
+</div><!-- /slide 3 -->
+
+<!-- ===== SLIDE 4: 도박+복권 ===== -->
+<div class="slide" data-index="4">
+<div class="round-header" id="r4">
+  <span class="round-num">4라운드</span>
+  <div class="round-title">도박장 오픈 — 연우의 소굴</div>
+  <div class="round-sub">장연우의 도박장. 홀짝 + 복권 동시 오픈.</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    공화국의 뒷골목에 거대한 문이 열렸습니다.
+    <span class="b"></span>
+    암흑이익당의 <em>장연우</em>가 지하 벙커 시절부터 운영하던 카지노를
+    공식적으로 확장했습니다.
+    <span class="b"></span>
+    사람들은 이곳을 <em>"연우의 소굴"</em>이라 부릅니다.
+    <span class="b"></span>
+    홀짝 테이블이 돌아가고…
+    그 옆에는 <em>복권 판매대</em>가 세워졌습니다.
+    <span class="b"></span>
+    <span class="q">"희망도 상품이다. 그리고 나는 그걸 팔 줄 안다."</span>
+    <span class="b"></span>
+    합법과 불법의 경계에서… 누군가는 부를 쌓고, 누군가는 모든 것을 잃게 될 것입니다.
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템 — 홀짝 도박</div>
+  <div class="text">
+    베팅 금액을 걸고, 홀 또는 짝을 선택합니다.
+    맞추면 <em>×2</em>, 틀리면 <em>전액 손실</em>.
+    <span class="b"></span>
+    베팅: 최소 <em>10,000원</em> / 최대 <em>50,000원</em>
+    <span class="b"></span>
+    연속 베팅 가능 (최대 3연속).
+    <span class="q">3연속 성공 시 ×8 수익.</span>
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템 — 복권</div>
+  <div class="text">
+    복권 1장: <em>5,000원</em> — 1인 라운드당 최대 3장
+    <span class="b"></span>
+    🥇 1등 — <em>50,000원</em> (확률 5%)<br>
+    🥈 2등 — <em>20,000원</em> (확률 15%)<br>
+    🥉 3등 — <em>10,000원</em> (확률 30%)<br>
+    ❌ 꽝 — 0원 (확률 50%)
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">4라운드 진행</div>
+  <div class="text">
+    1. 정보 카드 배분<br>
+    2. 자유 시간 5분 — 주식 + 경마 + 도박 + 복권 + 정보 교환<br>
+    3. 경마 결과 발표<br>
+    4. 주가 변동 발표<br>
+    5. 대통령 정책 적용<br>
+    6. <em>은행 이자 적용</em> (대출자 이자 부과)<br>
+    7. 순위 발표
+  </div>
+</div>
+
+
+</div><!-- /slide 4 -->
+
+<!-- ===== SLIDE 5: 탄핵+정보거래소 ===== -->
+<div class="slide" data-index="5">
+<div class="round-header" id="r5">
+  <span class="round-num">5라운드</span>
+  <div class="round-title">정보 거래소 & 탄핵</div>
+  <div class="round-sub">정상린의 거래소 오픈 + 탄핵 투표. 게임의 분수령.</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    판타지 공화국이 혼돈에 빠지고 있습니다.
+    <span class="b"></span>
+    부의 격차는 벌어졌고, 불만은 높아졌으며,
+    변화를 요구하는 목소리가 커지고 있습니다.
+    <span class="b"></span>
+    한편, 혁신개발당의 <em>정상린</em>이
+    살아남은 데이터베이스를 기반으로 <em>정보 거래소</em>를 정식 오픈했습니다.
+    <span class="b"></span>
+    <span class="q">"이제 정보에는 가격이 붙습니다.
+    진실을 원한다면… 돈을 내십시오."</span>
+    <span class="b"></span>
+    이제 정보는 더 이상 공짜가 아닙니다.
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템 — 정보 거래소</div>
+  <div class="text">
+    이번 라운드부터 정보 카드를 <em>추가 구매</em>할 수 있습니다.
+    <span class="b"></span>
+    추가 정보 카드 1장: <em>10,000원</em><br>
+    1인 최대 2장 추가 구매 가능
+    <span class="b"></span>
+    <span class="q">기본 1장은 무료. 추가분만 유료.</span>
+  </div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션 — 탄핵</div>
+  <div class="text">
+    그리고, 국민들에게 한 가지 권리가 주어집니다.
+    <span class="b"></span>
+    <em>탄핵 투표.</em>
+    <span class="b"></span>
+    과반수가 찬성하면, 현 대통령은 물러나고
+    <em>새로운 선거</em>가 진행됩니다.
+    <span class="b"></span>
+    <span class="q">이번에는 NPC가 아닌… 플레이어도 출마할 수 있습니다.</span>
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">시스템 — 탄핵 투표</div>
+  <div class="text">
+    현 대통령을 유지할 것인지 투표합니다.
+    <span class="b"></span>
+    <em>과반수 탄핵 찬성</em> → 6라운드에 재선거 (플레이어 출마 가능)<br>
+    <em>과반수 유지</em> → 현 정책 계속
+    <span class="b"></span>
+    출마 비용: <em>20,000원</em>
+  </div>
+</div>
+<div class="memo">→ 탄핵 투표 2분. 결과에 따라 6라운드 재선거 or 유지.</div>
+
+<div class="line sys">
+  <div class="speaker sys">5라운드 진행</div>
+  <div class="text">
+    1. 탄핵 투표<br>
+    2. 정보 카드 배분 + 추가 구매<br>
+    3. 자유 시간 5분 — 주식 + 경마 + 도박 + 복권 + 은행<br>
+    4. 경마 결과<br>
+    5. 주가 변동<br>
+    6. 대통령 정책 적용<br>
+    7. 은행 이자<br>
+    8. 순위 발표
+  </div>
+</div>
+
+
+</div><!-- /slide 5 -->
+
+<!-- ===== SLIDE 6: 후반전 ===== -->
+<div class="slide" data-index="6">
+<div class="round-header" id="r6">
+  <span class="round-num">6라운드~</span>
+  <div class="round-title">후반전</div>
+  <div class="round-sub">모든 시스템 오픈. 정치 + 경제 + 도박 전면전.</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    판타지 공화국의 역사가 흘러가고 있습니다.
+    <span class="b"></span>
+    누군가는 제국을 세웠고, 누군가는 폐허 속에 서 있습니다.
+    하지만 아직 끝나지 않았습니다.
+    <span class="b"></span>
+    <em>마지막 기회가 남아 있습니다.</em>
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">후반 라운드 구조 (매 라운드 동일)</div>
+  <div class="text">
+    1. (재선거 시) 대통령 선거<br>
+    2. 정보 카드 배분 + 추가 구매<br>
+    3. 자유 시간 5분 — 전 시스템 오픈<br>
+    4. 경마 결과<br>
+    5. 주가 변동<br>
+    6. 대통령 정책 적용<br>
+    7. 은행 이자<br>
+    8. 순위 발표
+  </div>
+</div>
+
+
+</div><!-- /slide 6 -->
+
+<!-- ===== SLIDE 7: 최종 ===== -->
+<div class="slide" data-index="7">
+<div class="round-header" id="final">
+  <span class="round-num">최종 라운드</span>
+  <div class="round-title">결산 & 엔딩 분기</div>
+  <div class="round-sub">VIP룸 / 일반 종료 / 오징어게임</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    판타지 공화국의 시대가 저물고 있습니다.
+    <span class="b"></span>
+    모든 시장이 닫힙니다.
+    모든 주식이 현금화됩니다.
+    모든 빚이 정산됩니다.
+    <span class="b"></span>
+    지금부터, <em>최종 결산</em>을 시작합니다.
+  </div>
+</div>
+
+<div class="line sys">
+  <div class="speaker sys">최종 정산</div>
+  <div class="text">
+    1. 모든 보유 주식 → 현재 가격으로 <em>강제 매도</em><br>
+    2. 모든 대출금 + 이자 → <em>강제 상환</em><br>
+    3. <em>순자산 = 보유 현금 - 빚</em>
+  </div>
+</div>
+
+<div class="line dir">
+  <div class="speaker dir">연출</div>
+  <div class="text">순위를 하위부터 발표. 긴장감 있는 BGM.</div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    결산이 완료되었습니다.
+    <span class="b"></span>
+    이제, 여러분의 운명이 갈립니다.
+  </div>
+</div>
+
+<div class="line vip">
+  <div class="speaker vip">VIP룸 진출</div>
+  <div class="text">
+    순자산 <em>250,000원</em> 이상을 달성한 분들.
+    <span class="b"></span>
+    축하합니다. 여러분은 이 공화국의 <em>최상위 엘리트</em>입니다.
+    <span class="b"></span>
+    여러분에게는 특별한 공간이 준비되어 있습니다.
+    <em>VIP룸</em>으로 이동하십시오.
+    <span class="b"></span>
+    <span class="q">그곳에서… 진짜 최종 승자가 결정됩니다.</span>
+  </div>
+</div>
+
+<div class="line narr">
+  <div class="speaker narr">일반 종료</div>
+  <div class="text">
+    순자산 <em>0원 이상 ~ 250,000원 미만</em>인 분들.
+    <span class="b"></span>
+    여러분은 살아남았습니다. 부자는 아니지만, 파멸도 피했습니다.
+    <span class="b"></span>
+    <span class="q">여러분의 게임은 여기서 끝입니다.</span>
+  </div>
+</div>
+
+<div class="line squid">
+  <div class="speaker squid">오징어 게임 진출</div>
+  <div class="text">
+    그리고… 순자산이 <em>마이너스</em>인 분들.
+    <span class="b"></span>
+    여러분은 빚더미에 빠졌습니다.
+    이 공화국에서 여러분에게 남은 것은 아무것도 없습니다.
+    <span class="b"></span>
+    <span class="q">하지만… 기회가 하나 남아 있습니다.</span>
+    <span class="b"></span>
+    <em>오징어 게임.</em>
+    <span class="b"></span>
+    살아남으면, 빚이 탕감됩니다.
+    살아남지 못하면… 최하위가 확정됩니다.
+    <span class="b"></span>
+    이동하십시오.
+  </div>
+</div>
+
+<div class="line dir">
+  <div class="speaker dir">연출</div>
+  <div class="text">
+    화면: 3갈래 문. 금색 문(VIP) / 회색 문(일반) / 빨간 문(오징어게임).<br>
+    해당 플레이어 이름이 각 문 위에 표시.
+  </div>
+</div>
+<div class="memo">→ VIP룸과 오징어게임은 별도 공간에서 동시 진행. 일반 종료자는 관전.</div>
+
+
+<!-- VIP룸 -->
+<div class="sub-heading" style="margin-top:48px;">VIP룸 — 최상위 최종전</div>
+
+<div class="line vip">
+  <div class="speaker vip">내레이션 — VIP룸</div>
+  <div class="text">
+    VIP룸에 오신 것을 환영합니다.
+    <span class="b"></span>
+    여러분은 이 공화국에서 가장 많은 것을 얻은 자들입니다.
+    <span class="b"></span>
+    하지만 아직 끝이 아닙니다.
+    이곳에서 <em>최종 게임</em>이 진행됩니다.
+    <span class="b"></span>
+    이 게임의 승자가 <em>판타지 공화국의 진정한 승자</em>입니다.
+  </div>
+</div>
+<div class="memo">→ VIP룸 게임은 운영자 재량 (예: 최종 올인 포커, 심리 경매 등)</div>
+
+
+<!-- 오징어게임 -->
+<div class="sub-heading">오징어 게임 — 하위권 서바이벌</div>
+
+<div class="line squid">
+  <div class="speaker squid">내레이션 — 오징어 게임</div>
+  <div class="text">
+    여러분은 모든 것을 잃었습니다.
+    <span class="b"></span>
+    하지만 한 가지 기회가 남아 있습니다.
+    <span class="b"></span>
+    지금부터 <em>오징어 게임</em>을 시작합니다.
+    <span class="b"></span>
+    살아남은 자는 빚이 탕감되고, <em>일반 종료</em>로 복귀합니다.
+    탈락한 자는 <em>최하위</em>가 확정됩니다.
+  </div>
+</div>
+<div class="memo">→ 오징어게임은 운영자 재량 (예: 무궁화 꽃이 피었습니다, 구슬 게임 등)</div>
+
+
+<!-- 엔딩 -->
+<div class="sub-heading">엔딩</div>
+
+<div class="line narr">
+  <div class="speaker narr">내레이션</div>
+  <div class="text">
+    모든 게임이 종료되었습니다.
+    <span class="b"></span>
+    판타지 공화국의 최종 승자는…
+    <span class="b"></span>
+    <em>[VIP룸 최종 승자]</em>입니다.
+    <span class="b"></span>
+    당신은 폐허 속에서 시작하여,
+    돈을 모으고, 정치를 이용하고, 판단하고, 때로는 속이며
+    이 나라의 <em>정점</em>에 섰습니다.
+    <span class="b"></span>
+    <span class="q">…하지만 진짜 질문은 이것입니다.</span>
+    <span class="b"></span>
+    <em>당신은 어떤 방법으로 여기까지 왔습니까?</em>
+    <span class="b"></span>
+    게임을 종료합니다.
+  </div>
+</div>
+
+<div class="line dir">
+  <div class="speaker dir">연출</div>
+  <div class="text">
+    최종 전체 순위표:<br>
+    1위: VIP룸 승자 → VIP 참가자 → 일반 종료자(순자산순) → 오징어게임 생존자 → 오징어게임 탈락자<br>
+    BGM 엔딩 크레딧.
+  </div>
+</div>
+
+<div class="footer-text">메인딜러: 시스템 관리자 | 서브딜러: 박준혁, 정상린, 장연우</div>
+</div><!-- /slide 7 -->
+
+</div><!-- /slide-container -->
+
+<!-- 하단 바 -->
+<div class="bottom-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prev()">← 이전</button>
+  <span class="page-indicator" id="pageIndicator">1 / 8</span>
+  <button class="nav-btn" id="nextBtn" onclick="next()">다음 →</button>
+</div>
+<div class="key-hint">← → 키보드로도 이동 가능</div>
+
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const tabs = document.querySelectorAll('.round-tab');
+  const total = slides.length;
+
+  function goSlide(i) {
+    if (i < 0 || i >= total) return;
+    slides[current].classList.remove('active');
+    tabs[current].classList.remove('active');
+    current = i;
+    slides[current].classList.add('active');
+    tabs[current].classList.add('active');
+    document.getElementById('pageIndicator').textContent = (current + 1) + ' / ' + total;
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').disabled = current === total - 1;
+    document.querySelector('.slide-container').scrollTop = 0;
+  }
+
+  function next() { goSlide(current + 1); }
+  function prev() { goSlide(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+
+  goSlide(0);
+</script>
+
+</body>
+</html>

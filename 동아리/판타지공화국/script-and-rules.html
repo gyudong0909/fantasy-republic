@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>판타지 공화국 — 대본 & 룰북</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #0a0a0f; color: #e0e0e0;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,10,15,0.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid #1a1a2e;
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 20px; overflow-x: auto;
+    }
+    nav .logo { font-weight: 900; font-size: 14px; color: #f0c040; margin-right: 12px; white-space: nowrap; }
+    nav a {
+      color: #666; text-decoration: none; font-size: 12px;
+      padding: 5px 12px; border-radius: 20px; white-space: nowrap;
+      transition: all 0.3s;
+    }
+    nav a:hover, nav a.active { color: #fff; background: #1a1a2e; }
+
+    /* TAB SWITCH */
+    .tab-bar {
+      display: flex; gap: 0; margin: 80px auto 0; max-width: 1000px; padding: 0 20px;
+    }
+    .tab-btn {
+      padding: 12px 28px; font-size: 15px; font-weight: 700;
+      background: #12121c; border: 1px solid #1e1e30; color: #666;
+      cursor: pointer; transition: all 0.3s; border-bottom: none;
+      border-radius: 12px 12px 0 0;
+    }
+    .tab-btn.active { background: #16162a; color: #f0c040; border-color: #f0c040; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* MAIN */
+    .container {
+      max-width: 1000px; margin: 0 auto; padding: 0 20px 80px;
+      background: #16162a; border: 1px solid #1e1e30; border-top: none;
+      border-radius: 0 0 16px 16px; min-height: 80vh;
+    }
+
+    h1 {
+      font-size: 36px; font-weight: 900; padding: 40px 0 8px;
+      background: linear-gradient(135deg, #f0c040, #ff6b6b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .h1-sub { color: #666; font-size: 14px; margin-bottom: 40px; }
+
+    h2 {
+      font-size: 22px; font-weight: 900; color: #f0c040;
+      margin: 48px 0 6px; padding-top: 32px;
+      border-top: 1px solid #1e1e30;
+    }
+    h2:first-of-type { border-top: none; margin-top: 20px; }
+    .h2-sub { color: #666; font-size: 13px; margin-bottom: 20px; }
+
+    h3 {
+      font-size: 16px; font-weight: 700; color: #ccc;
+      margin: 28px 0 10px;
+    }
+
+    /* SCRIPT LINES */
+    .script-block {
+      margin: 16px 0; padding: 20px 24px;
+      background: #0e0e18; border-radius: 12px;
+      border-left: 3px solid #333;
+    }
+    .script-block.narration { border-left-color: #f0c040; }
+    .script-block.system { border-left-color: #6ab0ff; }
+    .script-block.direction { border-left-color: #666; font-style: italic; color: #888; }
+    .script-block.candidate-junhyuk { border-left-color: #6ab0ff; }
+    .script-block.candidate-sangrin { border-left-color: #6aff9a; }
+    .script-block.candidate-yeonwoo { border-left-color: #d06aff; }
+    .script-block.squid { border-left-color: #ff2d78; }
+    .script-block.vip { border-left-color: #ffd700; }
+
+    .script-label {
+      font-size: 11px; font-weight: 700; margin-bottom: 8px;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .label-narration { color: #f0c040; }
+    .label-system { color: #6ab0ff; }
+    .label-direction { color: #666; }
+    .label-squid { color: #ff2d78; }
+    .label-vip { color: #ffd700; }
+
+    .script-text {
+      font-size: 15px; line-height: 2; color: #ddd;
+    }
+    .script-text .em { color: #f0c040; font-weight: 700; }
+    .script-text .pause { display: block; height: 12px; }
+    .script-text .quiet { color: #888; }
+    /* .rub class removed — 루블 no longer used */
+
+    /* RULE CARDS */
+    .rule-card {
+      background: #0e0e18; border: 1px solid #1e1e30;
+      border-radius: 12px; padding: 20px 24px; margin: 12px 0;
+    }
+    .rule-card h4 {
+      font-size: 14px; font-weight: 700; color: #f0c040; margin-bottom: 8px;
+    }
+    .rule-card p, .rule-card li {
+      font-size: 13px; color: #aaa; line-height: 1.8;
+    }
+    .rule-card ul { padding-left: 18px; }
+
+    /* TABLE */
+    table {
+      width: 100%; border-collapse: collapse; margin: 12px 0;
+      font-size: 13px;
+    }
+    th {
+      background: #0e0e18; color: #f0c040; font-weight: 700;
+      padding: 10px 14px; text-align: left; border-bottom: 1px solid #1e1e30;
+    }
+    td {
+      padding: 10px 14px; border-bottom: 1px solid #1a1a2e; color: #aaa;
+    }
+    tr:hover td { background: rgba(240,192,64,0.03); }
+    /* .rub-cell removed — 루블 no longer used */
+
+    /* CANDIDATE BOX */
+    .cand-box {
+      border-radius: 12px; padding: 24px; margin: 16px 0;
+      border: 1px solid;
+    }
+    .cand-box.junhyuk { background: rgba(26,42,74,0.3); border-color: #2a4a7a; }
+    .cand-box.sangrin { background: rgba(26,58,42,0.3); border-color: #2a6a4a; }
+    .cand-box.yeonwoo { background: rgba(42,26,42,0.3); border-color: #4a2a5a; }
+    .cand-name { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+    .cand-party { font-size: 12px; margin-bottom: 12px; }
+    .cand-box h4 { font-size: 13px; font-weight: 700; margin: 12px 0 6px; }
+    .cand-box li { font-size: 13px; line-height: 1.8; color: #ccc; }
+    .cand-box ul { padding-left: 18px; }
+
+    /* HIGHLIGHT */
+    .highlight {
+      background: rgba(240,192,64,0.08); border: 1px solid rgba(240,192,64,0.2);
+      border-radius: 12px; padding: 20px 24px; margin: 20px 0;
+      font-size: 15px; color: #f0c040; font-weight: 700;
+      text-align: center; line-height: 1.8;
+    }
+
+    /* SQUID BOX */
+    .squid-box {
+      background: rgba(255,45,120,0.05); border: 1px solid rgba(255,45,120,0.3);
+      border-radius: 12px; padding: 20px 24px; margin: 16px 0;
+    }
+    .vip-box {
+      background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.3);
+      border-radius: 12px; padding: 20px 24px; margin: 16px 0;
+    }
+
+    /* WARNING */
+    .warning {
+      background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2);
+      border-radius: 12px; padding: 16px 20px; margin: 16px 0;
+      font-size: 13px; color: #ff8888; line-height: 1.8;
+    }
+
+    /* NOTE */
+    .note {
+      font-size: 12px; color: #666; line-height: 1.6;
+      margin: 8px 0; padding-left: 12px;
+      border-left: 2px solid #2a2a3e;
+    }
+
+    /* CURRENCY DISPLAY */
+    .currency-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px; margin: 16px 0;
+    }
+    .currency-chip {
+      background: #0e0e18; border: 1px solid #1e1e30; border-radius: 10px;
+      padding: 14px 10px; text-align: center;
+    }
+    .currency-chip .val { font-size: 18px; font-weight: 900; }
+    /* .currency-chip .rub removed — 루블 no longer used */
+    .currency-chip .use { font-size: 10px; color: #444; margin-top: 4px; }
+
+    /* ENDGAME FLOW */
+    .endgame-flow {
+      display: flex; gap: 16px; margin: 20px 0; flex-wrap: wrap;
+    }
+    .eg-box {
+      flex: 1; min-width: 200px; border-radius: 12px; padding: 20px;
+      text-align: center;
+    }
+    .eg-box.vip-zone { background: rgba(255,215,0,0.08); border: 2px solid #ffd700; }
+    .eg-box.mid-zone { background: rgba(100,100,100,0.08); border: 2px solid #555; }
+    .eg-box.squid-zone { background: rgba(255,45,120,0.08); border: 2px solid #ff2d78; }
+    .eg-box .eg-icon { font-size: 36px; margin-bottom: 8px; }
+    .eg-box .eg-title { font-size: 16px; font-weight: 900; margin-bottom: 4px; }
+    .eg-box .eg-cond { font-size: 12px; color: #888; }
+
+    footer { text-align: center; padding: 40px; color: #333; font-size: 12px; }
+
+    @media print {
+      nav, .tab-bar { display: none; }
+      body { background: #fff; color: #111; }
+      .container { background: #fff; border: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">판타지 공화국</span>
+  <a href="#" onclick="switchTab('script')" id="nav-script" class="active">대본</a>
+  <a href="#" onclick="switchTab('rules')" id="nav-rules">룰북</a>
+  <a href="#" onclick="switchTab('data')" id="nav-data">수치 데이터</a>
+  <a href="index.html">← 시각화로 돌아가기</a>
+</nav>
+
+<div class="tab-bar">
+  <div class="tab-btn active" onclick="switchTab('script')">📜 대본</div>
+  <div class="tab-btn" onclick="switchTab('rules')">📕 룰북</div>
+  <div class="tab-btn" onclick="switchTab('data')">📊 수치 데이터</div>
+</div>
+
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║              TAB 1: 대본                      ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+<div class="container tab-content active" id="tab-script">
+
+<h1>대본</h1>
+<p class="h1-sub">운영자가 읽는 전체 진행 대본. 순서대로 따라가면 됩니다.</p>
+
+
+<!-- ═══ 0라운드 ═══ -->
+<h2>0라운드 — 프롤로그</h2>
+<p class="h2-sub">게임 시작 전 세계관 소개. 화면에 영상/이미지와 함께 진행.</p>
+
+<div class="script-block direction">
+  <div class="script-label label-direction">연출</div>
+  <div class="script-text">화면: 완전히 무너진 도시. 먼지와 잿더미. BGM: 낮고 무거운 앰비언트.</div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    세계는… <span class="em">멸망했습니다.</span>
+    <span class="pause"></span>
+    국가는 붕괴했고, 질서는 사라졌으며, 법은 더 이상 존재하지 않습니다.
+  </div>
+</div>
+
+<div class="script-block direction">
+  <div class="script-label label-direction">연출</div>
+  <div class="script-text">폭발 흔적, 붕괴된 건물, 버려진 차량 이미지. 3초 정적, 바람 소리만.</div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    하지만…
+    <span class="pause"></span>
+    <span class="em">인류는 멸망하지 않았습니다.</span>
+    <span class="pause"></span>
+    여러분은, 그 마지막 생존자들입니다.
+  </div>
+</div>
+
+<div class="script-block direction">
+  <div class="script-label label-direction">연출</div>
+  <div class="script-text">사람들이 모여 있는 장면. 깃발이 세워진다. 점점 도시가 재건되는 모습. BGM 서서히 고조.</div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    그리고 지금, 여러분은 새로운 국가에 입장합니다.
+  </div>
+</div>
+
+<div class="script-block direction">
+  <div class="script-label label-direction">연출</div>
+  <div class="script-text">거대한 문이 열리며 새로운 도시 등장. 타이틀 "판타지 공화국" 대형 텍스트.</div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    이곳은 <span class="em">판타지 공화국.</span>
+    <span class="pause"></span>
+    이 나라에는 왕이 없습니다.
+    지배자도, 정해진 규칙도 없습니다.
+    <span class="pause"></span>
+    오직 하나만 존재합니다.
+    <span class="pause"></span>
+    <span class="em">돈.</span>
+    <span class="pause"></span>
+    이곳에서 돈은 단순한 자원이 아닙니다.
+    <span class="em">생존이며, 기회이며, 권력입니다.</span>
+  </div>
+</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">시스템 안내</div>
+  <div class="script-text">
+    여러분은 전부 <span class="em">100,000원</span>을 가지고 게임을 시작하게 됩니다.
+  </div>
+</div>
+
+<div class="note">→ 운영자: 이 시점에서 각 플레이어에게 100,000원 현금 배분 (50,000원×2 또는 10,000원×10)</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    여러분은 선택해야 합니다.
+    협력할 것인지, 속일 것인지, 지배할 것인지.
+    <span class="pause"></span>
+    그리고… 이 나라의 <span class="em">첫 번째 규칙</span>을 정할 시간입니다.
+    <span class="pause"></span>
+    <span class="em">누가 이 공화국을 이끌 것인가.</span>
+  </div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    그리고 한 가지 더.
+    <span class="pause"></span>
+    이 게임의 끝에서, 여러분은 세 갈래 길 앞에 서게 됩니다.
+    <span class="pause"></span>
+    <span class="em">250,000원</span> 이상을 모은 자는—
+    <span class="em">VIP룸</span>에 초대됩니다. 승자들만의 최종 게임.
+    <span class="pause"></span>
+    하지만 빚더미에 빠져 순자산이 <span class="em">마이너스</span>가 된 자는—
+    <span class="quiet">…오징어 게임에 진출하게 됩니다.</span>
+    <span class="pause"></span>
+    당신의 선택이 어느 문으로 이끌지… 지켜보겠습니다.
+  </div>
+</div>
+
+
+<!-- ═══ 1라운드 ═══ -->
+<h2>1라운드 — 대통령 선거</h2>
+<p class="h2-sub">후보 공개 → 당원 가입 → 투표 → 당선 발표</p>
+
+<h3>1-1. 후보 공개</h3>
+
+<div class="script-block direction">
+  <div class="script-label label-direction">연출</div>
+  <div class="script-text">3명의 실루엣이 등장. 하나씩 밝혀진다. BGM 긴장감 있게.</div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    인류를 지켜낸 세 명의 지도자가 있습니다.
+    그들은 각자의 방식으로 이 나라를 바꾸려 합니다.
+    <span class="pause"></span>
+    곧, 세 명의 후보가 공개됩니다.
+  </div>
+</div>
+
+<!-- 박준혁 -->
+<div class="script-block candidate-junhyuk">
+  <div class="script-label" style="color:#6ab0ff;">후보 1 공개</div>
+  <div class="script-text">
+    <span class="em" style="-webkit-text-fill-color:#6ab0ff;">⚔️ 박준혁 — 강철방위당</span>
+    <span class="pause"></span>
+    <span class="quiet">"질서 없는 자유는 혼돈일 뿐이다."</span>
+    <span class="pause"></span>
+    멸망 이전, 그는 군 기갑부대의 지휘관이었습니다.
+    문명이 무너진 날, 그는 군용마 부대를 이끌고 생존자들을 구출했습니다.
+    <span class="pause"></span>
+    그는 강력한 질서와 국방을 약속합니다.
+    세금을 걷되, 능력 있는 자에게 보상을 돌려주겠다고 말합니다.
+    <span class="pause"></span>
+    — 모든 국민에게 <span class="em">국방세 5,000원</span> 부과
+    — 매 라운드 수익 1위에게 <span class="em">보너스 10,000원</span> 지급
+    — 건설, 군수 산업 성장
+    <span class="pause"></span>
+    <span class="quiet">…훗날 그는 군용마를 훈련시키던 경험을 살려, 이 나라 최초의 경마장을 세우게 됩니다.</span>
+  </div>
+</div>
+
+<!-- 정상린 -->
+<div class="script-block candidate-sangrin">
+  <div class="script-label" style="color:#6aff9a;">후보 2 공개</div>
+  <div class="script-text">
+    <span class="em" style="-webkit-text-fill-color:#6aff9a;">🧪 정상린 — 혁신개발당</span>
+    <span class="pause"></span>
+    <span class="quiet">"성장은 선택이 아니라 필수다."</span>
+    <span class="pause"></span>
+    멸망 이전, 그는 국가 데이터센터의 수석 연구원이었습니다.
+    세상이 무너질 때, 그는 핵심 서버를 지켜냈고, 그 정보는 재건의 열쇠가 되었습니다.
+    <span class="pause"></span>
+    그는 기술과 정보의 힘을 믿습니다.
+    위험하더라도 성장해야 한다고 말합니다.
+    <span class="pause"></span>
+    — 모든 회사 <span class="em">변동폭 ×1.5배</span> (수익도 크고 손실도 큼)
+    — 당원에게 <span class="em">추가 정보 카드</span> 제공
+    — 기술, 에너지 산업 성장
+    <span class="pause"></span>
+    <span class="quiet">…훗날 그는 살아남은 데이터와 인맥을 무기로, 이 나라의 정보 거래소를 장악하게 됩니다.</span>
+  </div>
+</div>
+
+<!-- 장연우 -->
+<div class="script-block candidate-yeonwoo">
+  <div class="script-label" style="color:#d06aff;">후보 3 공개</div>
+  <div class="script-text">
+    <span class="em" style="-webkit-text-fill-color:#d06aff;">🕷️ 장연우 — 암흑이익당</span>
+    <span class="pause"></span>
+    <span class="quiet">"누군가 잃어야, 누군가는 얻는다."</span>
+    <span class="pause"></span>
+    멸망 이전, 그의 과거를 아는 사람은 없습니다.
+    다만 혼란 속에서 그가 가장 먼저 한 일은 — 지하 벙커에 카지노를 연 것이었습니다.
+    절망한 사람들이 마지막 희망을 걸고 모여들었고, 그는 그 위에 제국을 세웠습니다.
+    <span class="pause"></span>
+    그는 부의 재분배를 약속합니다.
+    하지만 그 이면에는… 약탈의 논리가 숨어 있습니다.
+    <span class="pause"></span>
+    — 매 라운드 자산 1위에게서 순자산의 <span class="em">10% 회수</span>
+    — 회수된 금액을 전원에게 <span class="em">균등 분배</span>
+    — 도박, 암시장 산업 성장
+    <span class="pause"></span>
+    <span class="quiet">…훗날 그는 공화국 뒷골목에 거대한 도박장을 열게 됩니다. 사람들은 그곳을 "연우의 소굴"이라 부릅니다.</span>
+  </div>
+</div>
+
+<h3>1-2. 당원 가입</h3>
+
+<div class="script-block system">
+  <div class="script-label label-system">시스템 안내</div>
+  <div class="script-text">
+    이제, <span class="em">당원 가입</span>이 시작됩니다.
+    <span class="pause"></span>
+    참여할 당을 선택하거나, 무소속으로 남으십시오.
+    <span class="pause"></span>
+    당에 가입하려면 <span class="em">10,000원</span>이 필요합니다.
+    가입하지 않아도 게임 참여에는 문제가 없습니다.
+    <span class="pause"></span>
+    <span class="quiet">소속 당의 후보가 당선되면 <span class="em">정보 카드 2장</span>이 보상으로 지급됩니다.</span>
+  </div>
+</div>
+
+<div class="note">→ 운영자: 가입 시간 3분. 가입자는 10,000원 회수. 당원 명단 기록.</div>
+
+<h3>1-3. 투표</h3>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    당원 가입이 종료되었습니다.
+    <span class="pause"></span>
+    지금부터, 이 나라의 <span class="em">초대 대통령 선거</span>가 진행됩니다.
+    <span class="pause"></span>
+    당신의 선택이, 이 나라의 첫 번째 권력을 결정합니다.
+  </div>
+</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">시스템 안내</div>
+  <div class="script-text">
+    세 후보 중 한 명에게 투표하십시오.
+    무소속 플레이어도 투표할 수 있습니다. 기권도 가능합니다.
+    <span class="pause"></span>
+    투표는 <span class="em">비공개</span>로 진행됩니다.
+  </div>
+</div>
+
+<div class="note">→ 운영자: 투표 시간 2분. 종이 투표 or 화면 투표. 집계 후 결과 발표.</div>
+
+<h3>1-4. 당선 발표</h3>
+
+<div class="script-block direction">
+  <div class="script-label label-direction">연출</div>
+  <div class="script-text">투표 결과 바 애니메이션. 드럼롤. 당선자 이미지 크게.</div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    투표가 종료되었습니다.
+    <span class="pause"></span>
+    판타지 공화국의 초대 대통령은…
+    <span class="pause"></span>
+    <span class="em">[당선자 이름]</span>입니다.
+  </div>
+</div>
+
+<div class="script-block candidate-junhyuk">
+  <div class="script-label" style="color:#6ab0ff;">박준혁 당선 시</div>
+  <div class="script-text">
+    <span class="quiet">"질서가 세워졌습니다."</span>
+    <span class="pause"></span>
+    박준혁 대통령의 정책이 시행됩니다.
+    — 모든 국민에게 <span class="em">국방세 5,000원</span> 부과
+    — 매 라운드 수익 1위에게 <span class="em">보너스 10,000원</span> 지급
+    — 건설, 군수 산업이 성장합니다.
+  </div>
+</div>
+
+<div class="script-block candidate-sangrin">
+  <div class="script-label" style="color:#6aff9a;">정상린 당선 시</div>
+  <div class="script-text">
+    <span class="quiet">"성장의 시대가 시작됩니다."</span>
+    <span class="pause"></span>
+    정상린 대통령의 정책이 시행됩니다.
+    — 모든 회사의 <span class="em">변동폭이 ×1.5배</span>
+    — 당원에게 <span class="em">추가 정보 카드</span> 제공
+    — 기술, 에너지 산업이 성장합니다.
+  </div>
+</div>
+
+<div class="script-block candidate-yeonwoo">
+  <div class="script-label" style="color:#d06aff;">장연우 당선 시</div>
+  <div class="script-text">
+    <span class="quiet">"재분배의 시대가 열렸습니다."</span>
+    <span class="pause"></span>
+    장연우 대통령의 정책이 시행됩니다.
+    — 매 라운드 자산 1위에게서 순자산의 <span class="em">10%</span> 회수
+    — 회수된 금액을 전원에게 <span class="em">균등 분배</span>
+    — 도박, 암시장 산업이 성장합니다.
+  </div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    대통령이 결정되었습니다.
+    이제, 이 나라에 <span class="em">경제</span>가 시작됩니다.
+    <span class="pause"></span>
+    다음 라운드부터, 여러분은 <span class="em">회사에 투자</span>할 수 있습니다.
+    정보를 모으고, 판단하고, 돈을 굴리십시오.
+    <span class="pause"></span>
+    생존은 여러분의 선택에 달려 있습니다.
+  </div>
+</div>
+
+
+<!-- ═══ 2라운드 ═══ -->
+<h2>2라운드 — 경제 시작: 주식 투자</h2>
+<p class="h2-sub">회사 공개 → 정보 배분 → 투자 시간 → 결산</p>
+
+<h3>2-1. 회사 공개</h3>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    판타지 공화국에 <span class="em">6개의 회사</span>가 설립되었습니다.
+    <span class="pause"></span>
+    각 회사는 서로 다른 산업에 속해 있으며,
+    대통령의 정책에 따라 성장하거나 쇠퇴합니다.
+  </div>
+</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">회사 목록 공개</div>
+  <div class="script-text">
+    🏪 <span class="em">용암시장</span> — 시장 산업 / 1주 <span class="em">20,000원</span><br>
+    🎡 <span class="em">연우랜드</span> — 놀이 산업 / 1주 <span class="em">20,000원</span><br>
+    ⚽ <span class="em">토토스포츠</span> — 스포츠 산업 / 1주 <span class="em">20,000원</span><br>
+    🦁 <span class="em">야생동물원</span> — 동물원 산업 / 1주 <span class="em">20,000원</span><br>
+    🛡️ <span class="em">강철방산</span> — 방산 산업 / 1주 <span class="em">20,000원</span><br>
+    💰 <span class="em">쉴드펀드</span> — 펀드 / 1주 <span class="em">20,000원</span>
+    <span class="pause"></span>
+    <span class="quiet">모든 구매는 10,000원 단위입니다. 매수 수수료 1,000원/건.</span>
+  </div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    모든 회사는 현재 <span class="em">주당 20,000원</span>입니다.
+    <span class="pause"></span>
+    하지만 다음 라운드에는… 누군가는 오르고, 누군가는 떨어집니다.
+    <span class="pause"></span>
+    <span class="em">어떤 회사가 오를지는 — 정보에 달려 있습니다.</span>
+  </div>
+</div>
+
+<h3>2-2. 정보 카드 배분</h3>
+
+<div class="script-block system">
+  <div class="script-label label-system">시스템 안내</div>
+  <div class="script-text">
+    각 플레이어에게 <span class="em">정보 카드 1장</span>이 비공개로 지급됩니다.
+    <span class="pause"></span>
+    정보 카드에는 특정 회사의 다음 라운드 가격 변동 힌트가 적혀 있습니다.
+    <span class="pause"></span>
+    <span class="quiet">주의: 모든 정보가 정확한 것은 아닙니다.</span>
+    일부 카드는 <span class="em">불완전하거나 거짓</span>일 수 있습니다.
+    <span class="pause"></span>
+    정보를 다른 플레이어와 <span class="em">공유, 거래, 또는 거짓말</span>할 수 있습니다.
+  </div>
+</div>
+
+<div class="note">→ 운영자: 미리 준비한 정보 카드를 1인 1장 배분. 정확 70% / 거짓 30% 비율 권장.</div>
+
+<h3>2-3. 자유 시간 (정보 교환 + 투자)</h3>
+
+<div class="script-block system">
+  <div class="script-label label-system">시스템 안내</div>
+  <div class="script-text">
+    지금부터 <span class="em">5분간</span> 자유 시간입니다.
+    <span class="pause"></span>
+    이 시간 동안:
+    — 다른 플레이어와 <span class="em">정보를 교환</span>할 수 있습니다.
+    — 회사 주식을 <span class="em">매수</span>할 수 있습니다. (10,000원 단위)
+    — 은행에서 <span class="em">대출</span>을 받을 수 있습니다.
+    <span class="pause"></span>
+    투자는 운영자 데스크에서 진행됩니다.
+    <span class="quiet">"○○ 회사 ○주 매수" 형태로 신청하십시오.</span>
+  </div>
+</div>
+
+<div class="note">→ 운영자: 5분 타이머. 플레이어가 오면 매수/매도 처리. 시스템에 기록.</div>
+
+<h3>2-4. 라운드 종료 & 결산</h3>
+
+<div class="script-block direction">
+  <div class="script-label label-direction">연출</div>
+  <div class="script-text">타이머 종료 알림음. 화면에 주가 변동 차트 표시.</div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    투자 시간이 종료되었습니다.
+    <span class="pause"></span>
+    지금부터 이번 라운드의 <span class="em">시장 결과</span>를 발표합니다.
+  </div>
+</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">시스템 — 가격 변동 발표</div>
+  <div class="script-text">
+    <span class="quiet">(회사별로 하나씩 발표)</span>
+    <span class="pause"></span>
+    🏪 용암시장: 20,000원 → <span class="em">[변동 후 가격]</span><br>
+    🎡 연우랜드: 20,000원 → <span class="em">[변동 후 가격]</span><br>
+    ⚽ 토토스포츠: 20,000원 → <span class="em">[변동 후 가격]</span><br>
+    🦁 야생동물원: 20,000원 → <span class="em">[변동 후 가격]</span><br>
+    🛡️ 강철방산: 20,000원 → <span class="em">[변동 후 가격]</span><br>
+    💰 쉴드펀드: 20,000원 → <span class="em">[변동 후 가격]</span>
+  </div>
+</div>
+
+<div class="note">→ 운영자: 미리 정해둔 가격 변동표 적용. 대통령 정책 보정 반영. 각 플레이어 자산 재계산.</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">시스템 — 대통령 정책 적용</div>
+  <div class="script-text">
+    <span class="quiet">(당선자에 따라 해당하는 것만 읽기)</span>
+    <span class="pause"></span>
+    ⚔️ 박준혁: 전원 <span class="em">국방세 5,000원</span> 징수. 수익 1위에게 <span class="em">보너스 10,000원</span> 지급.<br>
+    🧪 정상린: 당원에게 추가 정보 카드 1장 지급.<br>
+    🕷️ 장연우: 자산 1위 플레이어에게서 순자산의 <span class="em">10%</span> 회수 → 전원 균등 분배.
+  </div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    2라운드가 종료되었습니다.
+    <span class="quiet">현재 순위가 화면에 표시됩니다.</span>
+    <span class="pause"></span>
+    다음 라운드에는 새로운 기회가 열립니다.
+  </div>
+</div>
+
+
+<!-- ═══ 3라운드 ═══ -->
+<h2>3라운드 — 경마 오픈</h2>
+<p class="h2-sub">주식 + 경마. 단기 수익 채널 추가.</p>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    판타지 공화국에 새로운 시설이 문을 열었습니다.
+    <span class="pause"></span>
+    강철방위당의 <span class="em">박준혁</span>이 군용마 훈련장을 개조하여
+    이 나라 최초의 <span class="em">경마장</span>을 세웠습니다.
+    <span class="pause"></span>
+    <span class="quiet">"말은 전쟁터에서만 달리는 게 아니다."</span>
+    <span class="pause"></span>
+    빠른 돈을 원하는 자에게 기회가 주어집니다.
+    하지만 잃는 것도 빠를 것입니다.
+  </div>
+</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">시스템 안내 — 경마</div>
+  <div class="script-text">
+    경마에는 <span class="em">4마리의 말</span>이 출전합니다.
+    <span class="pause"></span>
+    🐎 1번 말 — 배당 <span class="em">×2</span> (승률 높음)<br>
+    🐎 2번 말 — 배당 <span class="em">×3</span><br>
+    🐎 3번 말 — 배당 <span class="em">×5</span><br>
+    🐎 4번 말 — 배당 <span class="em">×10</span> (승률 낮음)
+    <span class="pause"></span>
+    베팅: 최소 <span class="em">10,000원</span> / 최대 <span class="em">20,000원</span>
+    <span class="quiet">결과는 즉시 발표됩니다.</span>
+  </div>
+</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">3라운드 진행 순서</div>
+  <div class="script-text">
+    1. 정보 카드 배분 (1인 1장)<br>
+    2. 자유 시간 5분 — 주식 매매 + 정보 교환 + 경마 베팅<br>
+    3. 경마 결과 발표<br>
+    4. 주가 변동 발표<br>
+    5. 대통령 정책 적용<br>
+    6. 라운드 결산 & 순위 발표
+  </div>
+</div>
+
+
+<!-- ═══ 4라운드 ═══ -->
+<h2>4라운드 — 도박장 오픈</h2>
+<p class="h2-sub">고위험 고수익. 뒤처진 사람의 역전 기회.</p>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    공화국의 뒷골목에 <span class="em">도박장</span>이 문을 열었습니다.
+    <span class="pause"></span>
+    암흑이익당의 <span class="em">장연우</span>가 지하 벙커 시절부터 운영하던 카지노를
+    공식적으로 확장했습니다.
+    <span class="pause"></span>
+    사람들은 이곳을 <span class="em">"연우의 소굴"</span>이라 부릅니다.
+    <span class="pause"></span>
+    합법과 불법의 경계에서… 누군가는 부를 쌓고, 누군가는 모든 것을 잃게 될 것입니다.
+  </div>
+</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">시스템 안내 — 도박 (홀짝)</div>
+  <div class="script-text">
+    베팅 금액을 걸고, 홀 또는 짝을 선택합니다.
+    맞추면 <span class="em">×2</span>, 틀리면 <span class="em">전액 손실</span>.
+    <span class="pause"></span>
+    베팅: 최소 <span class="em">10,000원</span> / 최대 <span class="em">50,000원</span>
+    <span class="pause"></span>
+    연속 베팅 가능 (최대 3연속).
+    <span class="quiet">3연속 성공 시 ×8 수익.</span>
+  </div>
+</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">4라운드 진행 순서</div>
+  <div class="script-text">
+    1. 정보 카드 배분<br>
+    2. 자유 시간 5분 — 주식 + 경마 + 도박 + 정보 교환<br>
+    3. 경마 결과 발표<br>
+    4. 주가 변동 발표<br>
+    5. 대통령 정책 적용<br>
+    6. <span class="em">은행 이자 적용</span> (대출자 이자 부과)<br>
+    7. 라운드 결산 & 순위 발표
+  </div>
+</div>
+
+
+<!-- ═══ 5라운드 ═══ -->
+<h2>5라운드 — 복권 발매 & 탄핵</h2>
+<p class="h2-sub">운 기반 역전 + 재선거 가능성.</p>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    판타지 공화국이 혼돈에 빠지고 있습니다.
+    <span class="pause"></span>
+    부의 격차는 벌어졌고, 불만은 높아졌으며, 변화를 요구하는 목소리가 커지고 있습니다.
+    <span class="pause"></span>
+    한편, 혁신개발당의 <span class="em">정상린</span>이 살아남은 데이터베이스를 기반으로
+    <span class="em">정보 거래소</span>를 정식 오픈했습니다.
+    이제 정보는 더 이상 공짜가 아닙니다.
+    <span class="pause"></span>
+    그리고… <span class="em">복권</span>이 발매됩니다.
+  </div>
+</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">시스템 안내 — 복권</div>
+  <div class="script-text">
+    복권 1장: <span class="em">5,000원</span> — 1인 라운드당 최대 3장
+    <span class="pause"></span>
+    🥇 1등 — <span class="em">50,000원</span> (확률 5%)<br>
+    🥈 2등 — <span class="em">20,000원</span> (확률 15%)<br>
+    🥉 3등 — <span class="em">10,000원</span> (확률 30%)<br>
+    ❌ 꽝 — 0원 (확률 50%)
+  </div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션 — 정치 이벤트</div>
+  <div class="script-text">
+    그리고, 국민들에게 한 가지 권리가 주어집니다.
+    <span class="pause"></span>
+    <span class="em">탄핵 투표.</span>
+    <span class="pause"></span>
+    과반수가 찬성하면, 현 대통령은 물러나고
+    <span class="em">새로운 선거</span>가 진행됩니다.
+    <span class="pause"></span>
+    <span class="quiet">이번에는 NPC가 아닌… 플레이어도 출마할 수 있습니다.</span>
+  </div>
+</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">시스템 안내 — 탄핵 투표</div>
+  <div class="script-text">
+    현 대통령을 유지할 것인지 투표합니다.
+    <span class="pause"></span>
+    <span class="em">과반수 탄핵 찬성</span> → 6라운드에 재선거 (플레이어 출마 가능)<br>
+    <span class="em">과반수 유지</span> → 현 정책 계속
+    <span class="pause"></span>
+    출마 비용: <span class="em">20,000원</span>
+  </div>
+</div>
+
+<div class="note">→ 운영자: 탄핵 투표 2분. 결과에 따라 6라운드 시작 시 재선거 or 기존 정책 유지.</div>
+
+
+<!-- ═══ 6라운드~ ═══ -->
+<h2>6라운드~ — 후반전</h2>
+<p class="h2-sub">모든 시스템 오픈. 정치 + 경제 + 도박 전면전.</p>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    판타지 공화국의 역사가 흘러가고 있습니다.
+    <span class="pause"></span>
+    누군가는 제국을 세웠고, 누군가는 폐허 속에 서 있습니다.
+    하지만 아직 끝나지 않았습니다.
+    <span class="pause"></span>
+    <span class="em">마지막 기회가 남아 있습니다.</span>
+  </div>
+</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">후반 라운드 구조 (매 라운드 동일)</div>
+  <div class="script-text">
+    1. (재선거 시) 대통령 선거<br>
+    2. 정보 카드 배분<br>
+    3. 자유 시간 5분 — 주식 + 경마 + 도박 + 복권 + 은행 + 정보 교환<br>
+    4. 경마 결과<br>
+    5. 주가 변동<br>
+    6. 대통령 정책 적용<br>
+    7. 은행 이자<br>
+    8. 순위 발표
+  </div>
+</div>
+
+
+<!-- ═══ 최종 라운드 ═══ -->
+<h2>최종 라운드 — 결산 & 엔딩 분기</h2>
+<p class="h2-sub">모든 자산 정리 → VIP룸 / 일반 종료 / 오징어게임 3갈래.</p>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    판타지 공화국의 시대가 저물고 있습니다.
+    <span class="pause"></span>
+    모든 시장이 닫힙니다.
+    모든 주식이 현금화됩니다.
+    모든 빚이 정산됩니다.
+    <span class="pause"></span>
+    지금부터, <span class="em">최종 결산</span>을 시작합니다.
+  </div>
+</div>
+
+<div class="script-block system">
+  <div class="script-label label-system">최종 정산</div>
+  <div class="script-text">
+    1. 모든 보유 주식을 현재 가격으로 <span class="em">강제 매도</span><br>
+    2. 모든 대출금 + 이자를 <span class="em">강제 상환</span><br>
+    3. <span class="em">순자산 = 보유 현금 - 빚</span>
+  </div>
+</div>
+
+<div class="script-block direction">
+  <div class="script-label label-direction">연출</div>
+  <div class="script-text">순위를 하위부터 발표. 긴장감 있는 BGM. 화면에 하나씩 이름 등장.</div>
+</div>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    결산이 완료되었습니다.
+    <span class="pause"></span>
+    이제, 여러분의 운명이 갈립니다.
+  </div>
+</div>
+
+<!-- VIP룸 -->
+<div class="script-block vip">
+  <div class="script-label label-vip">VIP룸 진출</div>
+  <div class="script-text">
+    순자산 <span class="em">250,000원</span> 이상을 달성한 분들.
+    <span class="pause"></span>
+    축하합니다. 여러분은 이 공화국의 <span class="em">최상위 엘리트</span>입니다.
+    <span class="pause"></span>
+    여러분에게는 특별한 공간이 준비되어 있습니다.
+    <span class="em">VIP룸</span>으로 이동하십시오.
+    <span class="pause"></span>
+    <span class="quiet">그곳에서… 진짜 최종 승자가 결정됩니다.</span>
+  </div>
+</div>
+
+<!-- 일반 종료 -->
+<div class="script-block narration">
+  <div class="script-label label-narration">일반 종료</div>
+  <div class="script-text">
+    순자산이 <span class="em">0원 이상 ~ 250,000원 미만</span>인 분들.
+    <span class="pause"></span>
+    여러분은 살아남았습니다. 부자는 아니지만, 파멸도 피했습니다.
+    <span class="pause"></span>
+    <span class="quiet">여러분의 게임은 여기서 끝입니다. 결과를 지켜보십시오.</span>
+  </div>
+</div>
+
+<!-- 오징어게임 -->
+<div class="script-block squid">
+  <div class="script-label label-squid">오징어 게임 진출</div>
+  <div class="script-text">
+    그리고… 순자산이 <span class="em">마이너스</span>인 분들.
+    <span class="pause"></span>
+    여러분은 빚더미에 빠졌습니다.
+    이 공화국에서 여러분에게 남은 것은 아무것도 없습니다.
+    <span class="pause"></span>
+    <span class="quiet">하지만… 기회가 하나 남아 있습니다.</span>
+    <span class="pause"></span>
+    <span class="em">오징어 게임.</span>
+    <span class="pause"></span>
+    살아남으면, 빚이 탕감됩니다.
+    살아남지 못하면… 최하위가 확정됩니다.
+    <span class="pause"></span>
+    이동하십시오.
+  </div>
+</div>
+
+<div class="script-block direction">
+  <div class="script-label label-direction">연출</div>
+  <div class="script-text">
+    화면: 3갈래 문. 금색 문(VIP) / 회색 문(일반) / 빨간 문(오징어게임).<br>
+    해당 플레이어 이름이 각 문 위에 표시된다.
+  </div>
+</div>
+
+<div class="note">→ 운영자: VIP룸 게임과 오징어게임은 별도 공간에서 동시 진행. 일반 종료자는 관전.</div>
+
+
+<!-- ═══ VIP룸 ═══ -->
+<h2>VIP룸 — 최상위 최종전</h2>
+<p class="h2-sub">250,000원 이상 달성자들의 최종 승부.</p>
+
+<div class="script-block vip">
+  <div class="script-label label-vip">내레이션 — VIP룸</div>
+  <div class="script-text">
+    VIP룸에 오신 것을 환영합니다.
+    <span class="pause"></span>
+    여러분은 이 공화국에서 가장 많은 것을 얻은 자들입니다.
+    <span class="pause"></span>
+    하지만 아직 끝이 아닙니다.
+    이곳에서 <span class="em">최종 게임</span>이 진행됩니다.
+    <span class="pause"></span>
+    <span class="quiet">[VIP룸 게임 내용은 운영자 재량 — 예: 최종 올인 포커, 심리 경매 등]</span>
+    <span class="pause"></span>
+    이 게임의 승자가 <span class="em">판타지 공화국의 진정한 승자</span>입니다.
+  </div>
+</div>
+
+
+<!-- ═══ 오징어게임 ═══ -->
+<h2>오징어 게임 — 하위권 서바이벌</h2>
+<p class="h2-sub">순자산 마이너스 플레이어들의 생존 게임.</p>
+
+<div class="script-block squid">
+  <div class="script-label label-squid">내레이션 — 오징어 게임</div>
+  <div class="script-text">
+    여러분은 모든 것을 잃었습니다.
+    <span class="pause"></span>
+    하지만 한 가지 기회가 남아 있습니다.
+    <span class="pause"></span>
+    지금부터 <span class="em">오징어 게임</span>을 시작합니다.
+    <span class="pause"></span>
+    살아남은 자는 빚이 탕감되고, <span class="em">일반 종료</span>로 복귀합니다.
+    탈락한 자는 <span class="em">최하위</span>가 확정됩니다.
+    <span class="pause"></span>
+    <span class="quiet">[오징어 게임 내용은 운영자 재량 — 예: 무궁화 꽃이 피었습니다, 구슬 게임 등]</span>
+  </div>
+</div>
+
+
+<!-- ═══ 엔딩 ═══ -->
+<h2>엔딩</h2>
+
+<div class="script-block narration">
+  <div class="script-label label-narration">내레이션</div>
+  <div class="script-text">
+    모든 게임이 종료되었습니다.
+    <span class="pause"></span>
+    판타지 공화국의 최종 승자는…
+    <span class="pause"></span>
+    <span class="em">[VIP룸 최종 승자 이름]</span>입니다.
+    <span class="pause"></span>
+    당신은 폐허 속에서 시작하여,
+    돈을 모으고, 정치를 이용하고, 판단하고, 때로는 속이며
+    이 나라의 <span class="em">정점</span>에 섰습니다.
+    <span class="pause"></span>
+    <span class="quiet">…하지만 진짜 질문은 이것입니다.</span>
+    <span class="pause"></span>
+    <span class="em">당신은 어떤 방법으로 여기까지 왔습니까?</span>
+    <span class="pause"></span>
+    게임을 종료합니다.
+  </div>
+</div>
+
+<div class="script-block direction">
+  <div class="script-label label-direction">연출</div>
+  <div class="script-text">
+    최종 전체 순위표 표시.<br>
+    1위: VIP룸 승자<br>
+    2~N위: VIP룸 참가자 (VIP 게임 결과순) → 일반 종료자 (순자산순) → 오징어게임 생존자 → 오징어게임 탈락자<br>
+    BGM 엔딩 크레딧.
+  </div>
+</div>
+
+</div><!-- /tab-script -->
+
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║              TAB 2: 룰북                      ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+<div class="container tab-content" id="tab-rules">
+
+<h1>룰북</h1>
+<p class="h1-sub">플레이어에게 설명할 규칙.</p>
+
+<h2>기본 규칙</h2>
+
+<div class="rule-card">
+  <h4>게임 목표</h4>
+  <p>최종 라운드 종료 시 <strong>순자산(현금 + 주식가치 - 빚)</strong> 기준으로 엔딩이 결정됩니다.</p>
+  <div class="endgame-flow" style="margin-top: 16px;">
+    <div class="eg-box vip-zone">
+      <div class="eg-icon">👑</div>
+      <div class="eg-title" style="color:#ffd700;">VIP룸</div>
+      <div class="eg-cond">순자산 250,000원 이상</div>
+    </div>
+    <div class="eg-box mid-zone">
+      <div class="eg-icon">🏠</div>
+      <div class="eg-title" style="color:#aaa;">일반 종료</div>
+      <div class="eg-cond">순자산 0원 ~ 249,900원</div>
+    </div>
+    <div class="eg-box squid-zone">
+      <div class="eg-icon">🔺</div>
+      <div class="eg-title" style="color:#ff2d78;">오징어 게임</div>
+      <div class="eg-cond">순자산 마이너스</div>
+    </div>
+  </div>
+</div>
+
+<div class="rule-card">
+  <h4>초기 자금</h4>
+  <p>모든 플레이어: <strong>100,000원</strong></p>
+</div>
+
+<div class="rule-card">
+  <h4>화폐 단위</h4>
+  <div class="currency-grid">
+    <div class="currency-chip">
+      <div class="val" style="color:#888;">1,000원</div>
+      <div class="use">세금·소액보상</div>
+    </div>
+    <div class="currency-chip">
+      <div class="val" style="color:#aaa;">5,000원</div>
+      <div class="use">수수료·복권</div>
+    </div>
+    <div class="currency-chip">
+      <div class="val" style="color:#ccc;">10,000원</div>
+      <div class="use">최소 구매 단위</div>
+    </div>
+    <div class="currency-chip">
+      <div class="val" style="color:#ddd;">20,000원</div>
+      <div class="use">주식 1주</div>
+    </div>
+    <div class="currency-chip">
+      <div class="val" style="color:#eee;">50,000원</div>
+      <div class="use">중간 거래</div>
+    </div>
+    <div class="currency-chip">
+      <div class="val" style="color:#f0c040;">100,000원</div>
+      <div class="use">큰 거래</div>
+    </div>
+    <div class="currency-chip">
+      <div class="val" style="color:#ffd700;">500,000원</div>
+      <div class="use">후반 고액</div>
+    </div>
+  </div>
+  <p style="margin-top:12px;"><strong>구매는 10,000원 단위</strong> / 세금·보상은 1,000원 단위 가능</p>
+</div>
+
+<div class="rule-card">
+  <h4>게임 길이</h4>
+  <p>총 <strong>6~8라운드</strong> (운영자 재량). 1라운드 = 약 10~15분.</p>
+</div>
+
+<h2>정치 시스템</h2>
+
+<div class="rule-card">
+  <h4>대통령 선거</h4>
+  <ul>
+    <li>1라운드: NPC 후보 3명 중 투표</li>
+    <li>5라운드: 탄핵 투표 → 통과 시 재선거 (플레이어 출마 가능)</li>
+    <li>투표는 비공개, 다수결. 동률 시 결선 투표.</li>
+  </ul>
+</div>
+
+<div class="rule-card">
+  <h4>당 시스템</h4>
+  <ul>
+    <li>가입비: <strong>10,000원</strong></li>
+    <li>가입은 1라운드에만 가능 (탈당/이적 불가)</li>
+    <li>당원 혜택은 소속 후보가 당선된 경우에만 적용</li>
+    <li>무소속은 혜택 없으나 비용도 없음</li>
+  </ul>
+</div>
+
+<h3>후보별 상세</h3>
+
+<div class="cand-box junhyuk">
+  <div class="cand-name" style="color:#6ab0ff;">⚔️ 박준혁 — 강철방위당</div>
+  <div class="cand-party" style="color:#6ab0ff88;">"질서 없는 자유는 혼돈일 뿐이다."</div>
+  <h4>📜 정책 (당선 시)</h4>
+  <ul>
+    <li>매 라운드 전원에게 <strong>국방세 5,000원</strong> 부과</li>
+    <li>라운드 수익 1위에게 <strong>보너스 10,000원</strong></li>
+    <li>건설/군수 산업 <strong>+20% 상승 보정</strong></li>
+    <li>도박/엔터 산업 <strong>-10% 하락 보정</strong></li>
+  </ul>
+  <h4>🎁 당원 혜택</h4>
+  <ul>
+    <li>국방세 <strong>50% 감면</strong> (5,000원 → 3,000원)</li>
+    <li>매 라운드 <strong>2,000원</strong> 보너스</li>
+    <li>주식 손실 시 <strong>최대 손실 50%까지만</strong> (하한 보호)</li>
+  </ul>
+</div>
+
+<div class="cand-box sangrin">
+  <div class="cand-name" style="color:#6aff9a;">🧪 정상린 — 혁신개발당</div>
+  <div class="cand-party" style="color:#6aff9a88;">"성장은 선택이 아니라 필수다."</div>
+  <h4>📜 정책 (당선 시)</h4>
+  <ul>
+    <li>모든 회사 가격 변동폭 <strong>×1.5배</strong></li>
+    <li>기술/에너지 산업 <strong>+20% 상승 보정</strong></li>
+    <li>건설 산업 중립</li>
+  </ul>
+  <h4>🎁 당원 혜택</h4>
+  <ul>
+    <li>매 라운드 <strong>추가 정보 카드 1장</strong></li>
+    <li>주식 수익에 <strong>+10% 추가</strong></li>
+    <li>신규 회사 생길 시 <strong>우선 매수권</strong></li>
+  </ul>
+</div>
+
+<div class="cand-box yeonwoo">
+  <div class="cand-name" style="color:#d06aff;">🕷️ 장연우 — 암흑이익당</div>
+  <div class="cand-party" style="color:#d06aff88;">"누군가 잃어야, 누군가는 얻는다."</div>
+  <h4>📜 정책 (당선 시)</h4>
+  <ul>
+    <li>매 라운드 자산 1위에게서 순자산의 <strong>10% 회수</strong></li>
+    <li>회수된 금액을 전원에게 <strong>균등 분배</strong></li>
+    <li>도박/암시장 산업 <strong>+20% 상승 보정</strong></li>
+    <li>건설/안정자산 <strong>-10% 하락 보정</strong></li>
+  </ul>
+  <h4>🎁 당원 혜택</h4>
+  <ul>
+    <li>회수 분배 시 <strong>2배 수령</strong></li>
+    <li>도박 베팅 수수료 <strong>면제</strong></li>
+    <li>플레이어 간 이체 수수료 <strong>면제</strong></li>
+  </ul>
+</div>
+
+<h2>경제 시스템 — 주식</h2>
+
+<div class="rule-card">
+  <h4>회사 목록</h4>
+  <table>
+    <tr><th>회사명</th><th>산업</th><th>초기 주가</th><th>특징</th></tr>
+    <tr><td>🏪 용암시장</td><td>시장</td><td>20,000원</td><td>안정적, 낮은 변동</td></tr>
+    <tr><td>🎡 연우랜드</td><td>놀이</td><td>20,000원</td><td>트렌드 민감, 이벤트 수혜</td></tr>
+    <tr><td>⚽ 토토스포츠</td><td>스포츠</td><td>20,000원</td><td>높은 성장/변동</td></tr>
+    <tr><td>🦁 야생동물원</td><td>동물원</td><td>20,000원</td><td>기반 산업</td></tr>
+    <tr><td>🛡️ 강철방산</td><td>방산</td><td>20,000원</td><td>정책 민감</td></tr>
+    <tr><td>💰 쉴드펀드</td><td>펀드</td><td>20,000원</td><td>고위험 고수익</td></tr>
+  </table>
+</div>
+
+<div class="rule-card">
+  <h4>주식 매매 규칙</h4>
+  <ul>
+    <li>매수: <strong>10,000원 단위</strong> (1주 = 20,000원)</li>
+    <li>1회 최대 매수: <strong>5주</strong></li>
+    <li>매도는 언제든 가능 (보유 주식에 한해)</li>
+    <li>거래 수수료: 매수 시 <strong>1,000원</strong> / 매도 무료</li>
+    <li>자유 시간 중에만 거래 가능</li>
+    <li>주가는 <strong>라운드 종료 시</strong> 한 번에 변동</li>
+  </ul>
+</div>
+
+<div class="rule-card">
+  <h4>정보 카드</h4>
+  <ul>
+    <li>매 라운드 시작 시 1인 1장 배분 (비공개)</li>
+    <li>내용: 특정 회사의 다음 변동 힌트</li>
+    <li>정확도: 약 <strong>70% 정확 / 30% 거짓 또는 불완전</strong></li>
+    <li>플레이어 간 공유, 거래, 거짓말 <strong>모두 허용</strong></li>
+    <li>추가 구매: 1장 <strong>10,000원</strong></li>
+    <li>소속 당 후보 당선 시 <strong>정보 카드 2장</strong> 보상 지급</li>
+  </ul>
+</div>
+
+<h2>금융 시스템 — 은행</h2>
+
+<div class="rule-card">
+  <h4>대출</h4>
+  <ul>
+    <li>대출 가능: 현재 순자산의 <strong>최대 50%</strong> (10,000원 단위)</li>
+    <li>이자율: 라운드당 <strong>10%</strong> (복리)</li>
+    <li>상환: 일부 또는 전액 (자유 시간 중)</li>
+    <li>2라운드~</li>
+  </ul>
+</div>
+
+<div class="rule-card">
+  <h4>이체 (플레이어 간 송금)</h4>
+  <ul>
+    <li>10,000원 단위, 양쪽 합의 필요</li>
+    <li>수수료: 이체 금액의 <strong>5%</strong> (최소 1,000원) — 장연우 당원 면제</li>
+    <li>운영자 데스크에서 신청</li>
+  </ul>
+</div>
+
+<div class="rule-card">
+  <h4>파산</h4>
+  <ul>
+    <li>순자산 <strong>0 이하</strong> → 파산 판정</li>
+    <li>보유 주식 전량 강제 매도, 빚 탕감</li>
+    <li>구제금 <strong>20,000원</strong> 지급 후 계속 플레이</li>
+    <li>파산 1회만 가능. 2번째 시 그대로 마이너스 유지 → <strong>최종 오징어게임 행</strong></li>
+  </ul>
+</div>
+
+<h2>도박 시스템</h2>
+
+<div class="rule-card">
+  <h4>🏇 경마 (3라운드~)</h4>
+  <ul>
+    <li>라운드당 1회. 4마리 중 1마리에 베팅.</li>
+    <li>베팅: <strong>10,000원</strong>~<strong>20,000원</strong></li>
+  </ul>
+  <table>
+    <tr><th>말</th><th>배당</th><th>승률</th></tr>
+    <tr><td>1번</td><td>×2</td><td>40%</td></tr>
+    <tr><td>2번</td><td>×3</td><td>30%</td></tr>
+    <tr><td>3번</td><td>×5</td><td>20%</td></tr>
+    <tr><td>4번</td><td>×10</td><td>10%</td></tr>
+  </table>
+</div>
+
+<div class="rule-card">
+  <h4>🎰 홀짝 도박 (4라운드~)</h4>
+  <ul>
+    <li>자유 시간 중 무제한. 즉시 결과.</li>
+    <li>맞추면 <strong>×2</strong>, 틀리면 <strong>전액 손실</strong></li>
+    <li>베팅: <strong>10,000원</strong>~<strong>50,000원</strong></li>
+    <li>연속 최대 3회 (3연속 성공 = ×8)</li>
+  </ul>
+</div>
+
+<div class="rule-card">
+  <h4>🎟️ 복권 (5라운드~)</h4>
+  <ul>
+    <li>1장 <strong>5,000원</strong> / 라운드당 최대 3장</li>
+  </ul>
+  <table>
+    <tr><th>등수</th><th>상금</th><th>확률</th></tr>
+    <tr><td>🥇 1등</td><td>50,000원</td><td>5%</td></tr>
+    <tr><td>🥈 2등</td><td>20,000원</td><td>15%</td></tr>
+    <tr><td>🥉 3등</td><td>10,000원</td><td>30%</td></tr>
+    <tr><td>❌ 꽝</td><td>0원</td><td>50%</td></tr>
+  </table>
+</div>
+
+<h2>특수 규칙</h2>
+
+<div class="rule-card">
+  <h4>탄핵 (5라운드)</h4>
+  <ul>
+    <li>5라운드 시작 시 탄핵 투표</li>
+    <li>과반수 찬성 → 6라운드에 재선거</li>
+    <li>플레이어 출마 가능 — 출마비 <strong>20,000원</strong></li>
+    <li>플레이어 대통령은 자신만의 정책 1개 선언 가능 (운영자 승인)</li>
+  </ul>
+</div>
+
+<div class="rule-card">
+  <h4>엔딩 분기</h4>
+  <div class="endgame-flow">
+    <div class="eg-box vip-zone">
+      <div class="eg-icon">👑</div>
+      <div class="eg-title" style="color:#ffd700;">VIP룸</div>
+      <div class="eg-cond">순자산 <strong>250,000원+</strong><br><br>최종 게임에서<br>진짜 1위 결정</div>
+    </div>
+    <div class="eg-box mid-zone">
+      <div class="eg-icon">🏠</div>
+      <div class="eg-title" style="color:#aaa;">일반 종료</div>
+      <div class="eg-cond">순자산 <strong>0원 ~ 249,900원</strong><br><br>게임 종료<br>순자산순 순위 확정</div>
+    </div>
+    <div class="eg-box squid-zone">
+      <div class="eg-icon">🔺</div>
+      <div class="eg-title" style="color:#ff2d78;">오징어 게임</div>
+      <div class="eg-cond">순자산 <strong>마이너스</strong><br><br>서바이벌 게임<br>생존 시 빚 탕감</div>
+    </div>
+  </div>
+</div>
+
+<div class="rule-card">
+  <h4>최종 순위 계산</h4>
+  <ul>
+    <li><strong>1위:</strong> VIP룸 최종 승자</li>
+    <li><strong>2~N위:</strong> VIP룸 참가자 (VIP 게임 순위)</li>
+    <li><strong>이후:</strong> 일반 종료자 (순자산순)</li>
+    <li><strong>이후:</strong> 오징어게임 생존자</li>
+    <li><strong>최하위:</strong> 오징어게임 탈락자</li>
+  </ul>
+</div>
+
+</div><!-- /tab-rules -->
+
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║              TAB 3: 수치 데이터                ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+<div class="container tab-content" id="tab-data">
+
+<h1>수치 데이터</h1>
+<p class="h1-sub">운영자 참고용. 밸런스 조정 시 이 수치를 변경.</p>
+
+<h2>화폐 단위표</h2>
+<table>
+  <tr><th>금액</th><th>주요 용도</th></tr>
+  <tr><td>1,000원</td><td>세금, 소액 보상, 수수료</td></tr>
+  <tr><td>5,000원</td><td>복권, 소액 보상</td></tr>
+  <tr><td>10,000원</td><td>최소 구매 단위, 당 가입, 베팅</td></tr>
+  <tr><td>20,000원</td><td>주식 1주, 중간 베팅</td></tr>
+  <tr><td>50,000원</td><td>도박 최대, 중간 거래</td></tr>
+  <tr><td>100,000원</td><td>시작 자금, 큰 거래</td></tr>
+  <tr><td>500,000원</td><td>후반 고액 거래</td></tr>
+</table>
+
+<h2>기본 수치</h2>
+<table>
+  <tr><th>항목</th><th>금액</th><th>단위</th><th>비고</th></tr>
+  <tr><td>초기 자금</td><td>100,000원</td><td>-</td><td>전원 동일</td></tr>
+  <tr><td>당 가입비</td><td>10,000원</td><td>10,000원</td><td>1라운드만</td></tr>
+  <tr><td>주식 초기가</td><td>20,000원/주</td><td>10,000원</td><td>전 회사 동일</td></tr>
+  <tr><td>1회 최대 매수</td><td>5주</td><td>-</td><td></td></tr>
+  <tr><td>매수 수수료</td><td>1,000원/건</td><td>1,000원</td><td>매도 무료</td></tr>
+  <tr><td>대출 한도</td><td>순자산 50%</td><td>10,000원</td><td></td></tr>
+  <tr><td>대출 이자</td><td>10%/라운드</td><td>1,000원</td><td>복리</td></tr>
+  <tr><td>이체 수수료</td><td>5% (최소 1,000원)</td><td>1,000원</td><td>장연우 당원 면제</td></tr>
+  <tr><td>파산 구제금</td><td>20,000원</td><td>-</td><td>1회 한정</td></tr>
+  <tr><td>출마비</td><td>20,000원</td><td>10,000원</td><td>5라운드 이후</td></tr>
+  <tr><td style="color:#ffd700;">VIP 커트라인</td><td style="color:#ffd700;">250,000원</td><td>-</td><td>시작의 2.5배</td></tr>
+  <tr><td style="color:#ff2d78;">오징어게임 조건</td><td style="color:#ff2d78;">0원 미만</td><td>-</td><td>빚 > 자산</td></tr>
+</table>
+
+<h2>대통령별 수치</h2>
+<table>
+  <tr><th>항목</th><th>⚔️ 박준혁</th><th>🧪 정상린</th><th>🕷️ 장연우</th></tr>
+  <tr><td>세금</td><td>5,000원<br>당원 3,000원</td><td>없음</td><td>없음</td></tr>
+  <tr><td>보상</td><td>수익 1위 +10,000원</td><td>당원 추가 정보</td><td>1위 자산 10%÷전원</td></tr>
+  <tr><td>당원 보너스</td><td>+2,000원/라운드</td><td>수익 +10%</td><td>분배 2배 수령</td></tr>
+  <tr><td>유리한 산업</td><td>건설, 군수 (+20%)</td><td>기술, 에너지 (+20%)</td><td>도박, 암시장 (+20%)</td></tr>
+  <tr><td>불리한 산업</td><td>도박, 엔터 (-10%)</td><td>없음 (변동↑)</td><td>건설, 안정 (-10%)</td></tr>
+</table>
+
+<h2>주가 변동 기본표</h2>
+<table>
+  <tr><th>회사</th><th>기본 변동 범위</th><th>박준혁 보정</th><th>정상린 보정</th><th>장연우 보정</th></tr>
+  <tr><td>🏪 용암시장</td><td>-10% ~ +15%</td><td><strong>+20%</strong></td><td>0</td><td>-10%</td></tr>
+  <tr><td>🎡 연우랜드</td><td>-15% ~ +20%</td><td><strong>+20%</strong></td><td>0</td><td>0</td></tr>
+  <tr><td>⚽ 토토스포츠</td><td>-20% ~ +30%</td><td>0</td><td><strong>+20%</strong></td><td>0</td></tr>
+  <tr><td>🦁 야생동물원</td><td>-15% ~ +25%</td><td>0</td><td><strong>+20%</strong></td><td>0</td></tr>
+  <tr><td>🛡️ 강철방산</td><td>-25% ~ +35%</td><td>-10%</td><td>변동폭 ×1.5</td><td><strong>+20%</strong></td></tr>
+  <tr><td>💰 쉴드펀드</td><td>-30% ~ +40%</td><td>-10%</td><td>변동폭 ×1.5</td><td><strong>+20%</strong></td></tr>
+</table>
+
+<div class="warning">
+  ⚠️ 변동 범위는 "이 범위 내에서 운영자가 결정"한다는 뜻.<br>
+  예: 토토스포츠 기본 +15% → 정상린 보정 +20% = 최종 +35%
+</div>
+
+<h2>정보 카드 예시</h2>
+<table>
+  <tr><th>카드</th><th>내용</th><th>정확 여부</th></tr>
+  <tr><td>A1</td><td>"토토스포츠가 큰 폭으로 상승할 것이다"</td><td style="color:#6aff9a;">정확</td></tr>
+  <tr><td>A2</td><td>"용암시장이 안정적으로 상승한다"</td><td style="color:#6aff9a;">정확</td></tr>
+  <tr><td>A3</td><td>"쉴드펀드가 폭락할 것이다"</td><td style="color:#6aff9a;">정확</td></tr>
+  <tr><td>B1</td><td>"연우랜드가 하락할 것이다"</td><td style="color:#ff6b6b;">거짓 (실제 상승)</td></tr>
+  <tr><td>B2</td><td>"강철방산이 크게 오른다"</td><td style="color:#ff6b6b;">거짓 (실제 하락)</td></tr>
+  <tr><td>C1</td><td>"동물원 관련 회사에 움직임이 있다"</td><td style="color:#f0c040;">불완전</td></tr>
+  <tr><td>C2</td><td>"이번 라운드는 전반적으로 하락세"</td><td style="color:#f0c040;">불완전</td></tr>
+</table>
+<div class="note">→ 라운드마다 플레이어 수만큼 준비. 비율: 정확 70% / 거짓 20% / 불완전 10%</div>
+
+<h2>도박 기대값</h2>
+
+<h3>경마</h3>
+<table>
+  <tr><th>말</th><th>배당</th><th>승률</th><th>20,000원 베팅 시 기대값</th></tr>
+  <tr><td>1번</td><td>×2</td><td>40%</td><td>16,000원 (기대: -4,000원)</td></tr>
+  <tr><td>2번</td><td>×3</td><td>30%</td><td>18,000원 (기대: -2,000원)</td></tr>
+  <tr><td>3번</td><td>×5</td><td>20%</td><td>20,000원 (기대: 0원)</td></tr>
+  <tr><td>4번</td><td>×10</td><td>10%</td><td>20,000원 (기대: 0원)</td></tr>
+</table>
+
+<h3>복권 (1장 5,000원 기준)</h3>
+<table>
+  <tr><th>등수</th><th>상금</th><th>확률</th><th>기대값</th></tr>
+  <tr><td>1등</td><td>50,000원</td><td>5%</td><td>2,500원</td></tr>
+  <tr><td>2등</td><td>20,000원</td><td>15%</td><td>3,000원</td></tr>
+  <tr><td>3등</td><td>10,000원</td><td>30%</td><td>3,000원</td></tr>
+  <tr><td>꽝</td><td>0원</td><td>50%</td><td>0원</td></tr>
+  <tr style="font-weight:700;"><td colspan="3">합계 기대값 (5,000원 투자)</td><td style="color:#ff6b6b;">8,500원 → +3,500원</td></tr>
+</table>
+<div class="warning">
+  ⚠️ 복권 기대값이 양수(+3,500원)! 밸런스 조정 추천:<br>
+  → 1등 30,000원 / 2등 10,000원 / 3등 6,000원으로 낮추거나<br>
+  → 꽝 확률 60%로 올리거나<br>
+  → 복권 가격 10,000원으로 올리기
+</div>
+
+<h2>라운드별 오픈 시스템</h2>
+<table>
+  <tr><th>라운드</th><th>주식</th><th>경마</th><th>도박</th><th>복권</th><th>은행</th><th>정치 이벤트</th></tr>
+  <tr><td>1</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>대통령 선거</td></tr>
+  <tr><td>2</td><td>✅</td><td>-</td><td>-</td><td>-</td><td>✅</td><td>-</td></tr>
+  <tr><td>3</td><td>✅</td><td>✅</td><td>-</td><td>-</td><td>✅</td><td>-</td></tr>
+  <tr><td>4</td><td>✅</td><td>✅</td><td>✅</td><td>-</td><td>✅</td><td>-</td></tr>
+  <tr><td>5</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>탄핵 투표</td></tr>
+  <tr><td>6~</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>(재선거)</td></tr>
+  <tr style="color:#ffd700;"><td>최종</td><td colspan="6">정산 → VIP룸(250,000원+) / 일반종료 / 오징어게임(마이너스)</td></tr>
+</table>
+
+<h2>엔딩 시뮬레이션 (20명 기준 예상)</h2>
+<table>
+  <tr><th>엔딩</th><th>조건</th><th>예상 인원</th><th>비고</th></tr>
+  <tr style="color:#ffd700;"><td>👑 VIP룸</td><td>순자산 250,000원+</td><td>2~4명</td><td>시작의 2.5배 — 꽤 어려움</td></tr>
+  <tr><td>🏠 일반 종료</td><td>0원 ~ 249,900원</td><td>12~15명</td><td>대다수</td></tr>
+  <tr style="color:#ff2d78;"><td>🔺 오징어게임</td><td>마이너스</td><td>2~4명</td><td>대출+투자 실패 시</td></tr>
+</table>
+
+</div><!-- /tab-data -->
+
+
+<footer>판타지 공화국 — 대본 & 룰북 v2.0 (100,000원 시작)</footer>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const tabs = { script: 0, rules: 1, data: 2 };
+  document.querySelectorAll('.tab-btn')[tabs[name]].classList.add('active');
+  document.getElementById('nav-' + name)?.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
