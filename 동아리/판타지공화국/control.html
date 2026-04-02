@@ -471,6 +471,32 @@ label{font-size:11px;color:#666;display:block;margin:6px 0 3px}
       </tbody>
     </table>
   </div>
+
+  <!-- ── 캐치볼 (숫자야구) ── -->
+  <div class="card">
+    <h3>⚾ 캐치볼 — 숫자야구</h3>
+    <p style="color:#888;font-size:12px;margin-bottom:10px">4자리 숫자 (중복 없음) &nbsp;·&nbsp; <span style="color:#4caf50">S</span>=자리·숫자 모두 맞음 &nbsp;·&nbsp; <span style="color:#f0c040">B</span>=숫자만 맞음 &nbsp;·&nbsp; X=없음</p>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+      <button class="btn on" onclick="catchGenAnswer()">🎲 새 문제 생성</button>
+      <span id="catchAnswerDisp" style="color:#f0c040;font-size:18px;font-weight:700;font-family:monospace;letter-spacing:4px"></span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+      <label style="color:#aaa;font-size:13px">빚 감면액:</label>
+      <input id="catchDebtReduce" type="number" step="10000" value="50000"
+        style="width:110px;background:#111;border:1px solid #333;color:#fff;padding:4px 8px;border-radius:4px;font-size:13px">
+      <span style="color:#888;font-size:12px">원 (정답 시 자동 표시)</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <input id="catchGuess" type="text" maxlength="4" placeholder="1234"
+        style="width:80px;background:#111;border:1px solid #555;color:#fff;padding:6px 10px;border-radius:4px;font-size:18px;font-family:monospace;text-align:center"
+        onkeydown="if(event.key==='Enter')catchCalc()">
+      <button class="btn on" onclick="catchCalc()">확인</button>
+      <button class="btn" onclick="catchReset()">기록 초기화</button>
+    </div>
+    <div id="catchStatus" style="color:#4caf50;font-size:15px;font-weight:700;margin-bottom:8px;min-height:22px"></div>
+    <div id="catchHistoryList"
+      style="max-height:220px;overflow-y:auto;background:#0a0a14;border:1px solid #222;border-radius:6px;padding:8px;font-size:14px;font-family:monospace"></div>
+  </div>
 </div>
 
 </div><!-- /main-area -->
@@ -1251,6 +1277,68 @@ function sendAgneramAnswer(){
   const sentence=AGNERAM_SENTENCES[lastAgneramIdx];
   ch.postMessage({type:'agneram-answer',data:{answer:sentence,questionNum:lastAgneramIdx+1}});
   document.getElementById('previewBox').innerHTML='애그너램 정답 표시 중';
+}
+
+// ═══════════════════════════════════════════
+// [14b] 캐치볼 (숫자야구)
+// ═══════════════════════════════════════════
+let _catchAnswer='';
+let _catchHistory=[];
+
+function catchGenAnswer(){
+  const pool=[0,1,2,3,4,5,6,7,8,9];
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  _catchAnswer=pool.slice(0,4).join('');
+  _catchHistory=[];
+  _renderCatchHistory();
+  document.getElementById('catchAnswerDisp').textContent='정답: '+_catchAnswer;
+  document.getElementById('catchStatus').textContent='';
+  document.getElementById('catchGuess').value='';
+  document.getElementById('catchGuess').focus();
+}
+
+function catchCalc(){
+  const guess=document.getElementById('catchGuess').value.trim();
+  if(!_catchAnswer){return alert('먼저 새 문제를 생성하세요');}
+  if(!/^\d{4}$/.test(guess)){return alert('4자리 숫자를 입력하세요');}
+  if(new Set(guess).size!==4){return alert('중복 없이 4자리를 입력하세요');}
+  let s=0,b=0;
+  for(let i=0;i<4;i++){
+    if(guess[i]===_catchAnswer[i]) s++;
+    else if(_catchAnswer.includes(guess[i])) b++;
+  }
+  const result=(s===0&&b===0)?'X':((s>0?s+'S':'')+(b>0?b+'B':''));
+  _catchHistory.push({guess,result,s,b});
+  _renderCatchHistory();
+  document.getElementById('catchGuess').value='';
+  document.getElementById('catchGuess').focus();
+  if(s===4){
+    const debt=parseInt(document.getElementById('catchDebtReduce').value)||0;
+    document.getElementById('catchStatus').textContent=
+      '🎉 정답! '+_catchAnswer+(debt>0?' — 빚 '+debt.toLocaleString()+'원 감면':'');
+  } else {
+    document.getElementById('catchStatus').textContent='';
+  }
+}
+
+function catchReset(){
+  _catchHistory=[];
+  _renderCatchHistory();
+  document.getElementById('catchStatus').textContent='';
+}
+
+function _renderCatchHistory(){
+  const el=document.getElementById('catchHistoryList');
+  if(!el) return;
+  if(_catchHistory.length===0){el.innerHTML='<span style="color:#444">기록 없음</span>';return;}
+  el.innerHTML=_catchHistory.map((h,i)=>{
+    const col=h.s===4?'#4caf50':(h.result==='X'?'#666':'#f0c040');
+    return `<div style="padding:3px 0;border-bottom:1px solid #1a1a2e">`+
+      `<span style="color:#888">${String(i+1).padStart(2,' ')}. </span>`+
+      `<span style="color:#fff;letter-spacing:3px">${h.guess}</span>`+
+      ` — <span style="color:${col};font-weight:700">${h.result}</span></div>`;
+  }).join('');
+  el.scrollTop=el.scrollHeight;
 }
 
 // ═══════════════════════════════════════════
