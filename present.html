@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>판타지 공화국 — 프레젠테이션</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; background: #000; color: #e0e0e0; }
+    body { font-family: 'Noto Sans KR', sans-serif; }
+
+    .view { display: none; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
+    .view.active { display: flex; }
+
+    /* === WAITING === */
+    .v-waiting { flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+    .v-waiting h1 { font-size: 48px; font-weight: 900; background: linear-gradient(135deg,#f0c040,#ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .v-waiting p { color: #333; font-size: 14px; }
+
+    /* === SCRIPT === */
+    .v-script { flex-direction: column; justify-content: center; align-items: center; padding: 60px 80px; position: relative; }
+    .v-script .round-badge { position: absolute; top: 32px; left: 40px; font-size: 13px; font-weight: 900; color: #f0c040; background: rgba(240,192,64,0.08); padding: 6px 16px; border-radius: 20px; }
+    .v-script .speaker-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; opacity:0; animation: fadeIn 0.4s 0.1s forwards; }
+    .v-script .main-text { font-size: 28px; font-weight: 400; line-height: 2; text-align: center; max-width: 900px; opacity:0; transform: translateY(20px); animation: fadeIn 0.6s forwards; }
+    .v-script .main-text em { font-style: normal; color: #f0c040; font-weight: 700; }
+    .v-script .main-text .q { color: #888; font-style: italic; }
+    .v-script .main-text .rub { color: #444; font-size: 18px; }
+    .speaker-label.narr { color: #f0c040; } .speaker-label.sys { color: #6ab0ff; } .speaker-label.dir { color: #555; }
+    .speaker-label.junhyuk { color: #6ab0ff; } .speaker-label.sangrin { color: #6aff9a; } .speaker-label.yeonwoo { color: #d06aff; }
+    .speaker-label.vip { color: #ffd700; } .speaker-label.squid { color: #ff2d78; }
+    .progress-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: linear-gradient(90deg,#f0c040,#ff6b6b); transition: width 0.5s; }
+    @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+    /* === TIMER === */
+    .v-timer { flex-direction: column; justify-content: center; align-items: center; gap: 16px; }
+    .v-timer .timer-label { font-size: 18px; color: #555; font-weight: 700; }
+    .v-timer .timer-num { font-size: 160px; font-weight: 900; font-variant-numeric: tabular-nums; color: #f0c040; transition: color 0.3s; }
+    .v-timer .timer-num.urgent { color: #ff4444; }
+
+    /* === SCOREBOARD === */
+    .v-scoreboard { flex-direction: column; padding: 60px 80px; overflow-y: auto; }
+    .v-scoreboard h2 { font-size: 28px; font-weight: 900; color: #f0c040; margin-bottom: 24px; }
+    .sb-row { display: flex; align-items: center; gap: 16px; padding: 14px 20px; margin: 4px 0; background: #0e0e18; border-radius: 10px; transition: all 0.3s; }
+    .sb-row.top1 { border: 1px solid #ffd700; background: rgba(255,215,0,0.05); }
+    .sb-row.negative { border: 1px solid #ff2d78; background: rgba(255,45,120,0.05); }
+    .sb-rank { font-size: 24px; font-weight: 900; width: 40px; text-align: center; color: #f0c040; }
+    .sb-name { font-size: 20px; font-weight: 700; flex: 1; }
+    .sb-bar-wrap { flex: 2; height: 8px; background: #1a1a2e; border-radius: 4px; overflow: hidden; }
+    .sb-bar-fill { height: 100%; border-radius: 4px; transition: width 1s; }
+    .sb-gold { font-size: 18px; font-weight: 900; min-width: 100px; text-align: right; }
+    .sb-party { font-size: 12px; color: #555; min-width: 60px; }
+
+    /* === STOCKS === */
+    .v-stocks { flex-direction: column; padding: 60px 80px; }
+    .v-stocks h2 { font-size: 28px; font-weight: 900; color: #f0c040; margin-bottom: 24px; }
+    .stock-row { display: flex; align-items: center; gap: 16px; padding: 16px 20px; margin: 6px 0; background: #0e0e18; border-radius: 10px; }
+    .stock-icon { font-size: 28px; width: 40px; text-align: center; }
+    .stock-name { font-size: 18px; font-weight: 700; width: 140px; }
+    .stock-price { font-size: 24px; font-weight: 900; width: 100px; text-align: right; }
+    .stock-change { font-size: 16px; font-weight: 700; width: 80px; text-align: right; }
+    .stock-change.up { color: #ff4444; }
+    .stock-change.down { color: #4488ff; }
+    .stock-change.flat { color: #666; }
+    .stock-history { flex: 1; display: flex; align-items: flex-end; gap: 2px; height: 40px; }
+    .stock-history .bar { width: 8px; border-radius: 2px 2px 0 0; background: #333; transition: height 0.5s; }
+
+    /* === VOTE === */
+    .v-vote { flex-direction: column; justify-content: center; align-items: center; padding: 60px 80px; gap: 24px; }
+    .v-vote h2 { font-size: 28px; font-weight: 900; color: #f0c040; }
+    .vote-cand { width: 100%; max-width: 700px; }
+    .vote-row { display: flex; align-items: center; gap: 16px; margin: 12px 0; }
+    .vote-name { font-size: 18px; font-weight: 700; width: 120px; }
+    .vote-bar-outer { flex: 1; height: 32px; background: #1a1a2e; border-radius: 8px; overflow: hidden; position: relative; }
+    .vote-bar-inner { height: 100%; border-radius: 8px; transition: width 1s; }
+    .vote-count { font-size: 18px; font-weight: 900; width: 60px; text-align: right; }
+    .vote-pct { font-size: 14px; color: #888; width: 50px; text-align: right; }
+
+    /* === HORSE === */
+    .v-horse { flex-direction: column; justify-content: center; align-items: center; padding: 60px; gap: 20px; }
+    .v-horse h2 { font-size: 28px; font-weight: 900; color: #f0c040; }
+    .horse-result { font-size: 80px; font-weight: 900; }
+    .horse-detail { font-size: 20px; color: #aaa; }
+
+    /* === KAKAO === */
+    .v-kakao { flex-direction: column; justify-content: center; align-items: center; gap: 28px; }
+    .v-kakao .kk-title { font-size: 36px; font-weight: 900; color: #f0c040; }
+    .v-kakao .kk-sub { font-size: 22px; color: #888; }
+    .v-kakao .kk-icon { font-size: 100px; line-height: 1; }
+    .v-kakao .kk-cands { display: flex; gap: 32px; margin-top: 8px; }
+    .v-kakao .kk-cand { padding: 20px 40px; border-radius: 16px; font-size: 28px; font-weight: 900; text-align: center; }
+
+    /* === QUIZ === */
+    .v-quiz { flex-direction: column; justify-content: flex-start; align-items: center; padding: 40px 100px 30px; overflow-y: auto; }
+    .v-quiz .quiz-title { font-size: 38px; font-weight: 900; color: #f0c040; margin-bottom: 4px; }
+    .v-quiz .quiz-badge { font-size: 13px; color: #555; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px; }
+    .v-quiz .quiz-steps { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 860px; margin-bottom: 16px; }
+    .v-quiz .quiz-step { display: flex; align-items: flex-start; gap: 20px; background: #0e0e18; border-radius: 12px; padding: 16px 24px; }
+    .v-quiz .quiz-step-num { font-size: 24px; font-weight: 900; color: #f0c040; min-width: 32px; line-height: 1.4; }
+    .v-quiz .quiz-step-body { flex: 1; }
+    .v-quiz .quiz-step-body b { color: #fff; font-size: 18px; display: block; margin-bottom: 3px; }
+    .v-quiz .quiz-step-body span { color: #666; font-size: 14px; line-height: 1.6; }
+    .v-quiz .quiz-step-body em { color: #f0c040; font-style: normal; font-weight: 700; }
+    .v-quiz .quiz-highlight { background: rgba(240,192,64,0.06); border: 1px solid rgba(240,192,64,0.25); border-radius: 12px; padding: 14px 24px; text-align: center; width: 100%; max-width: 860px; margin-bottom: 16px; line-height: 1.8; }
+    .v-quiz .quiz-highlight span { font-size: 14px; color: #777; }
+    .v-quiz .quiz-highlight b { font-size: 17px; color: #f0c040; }
+    .v-quiz .quiz-result-wrap { text-align: center; width: 100%; max-width: 860px; background: rgba(255,215,0,0.05); border: 1px solid rgba(255,215,0,0.3); border-radius: 16px; padding: 20px; }
+    .v-quiz .quiz-winner { font-size: 54px; font-weight: 900; color: #ffd700; }
+    .v-quiz .quiz-stats { font-size: 18px; color: #aaa; margin-top: 6px; }
+    .v-quiz .quiz-stats em { color: #ff6b6b; font-style: normal; }
+
+    /* === SCHEDULE === */
+    .v-schedule { flex-direction: column; padding: 50px 80px; overflow-y: auto; }
+    .v-schedule h2 { font-size: 28px; font-weight: 900; color: #f0c040; margin-bottom: 20px; }
+    .sch-row { display: flex; align-items: center; gap: 20px; padding: 12px 20px; margin: 4px 0; background: #0e0e18; border-radius: 10px; }
+    .sch-time { font-size: 15px; color: #888; width: 110px; flex-shrink: 0; }
+    .sch-round { font-size: 18px; font-weight: 900; color: #f0c040; width: 40px; flex-shrink: 0; }
+    .sch-label { font-size: 17px; flex: 1; }
+    .sch-who { font-size: 13px; color: #555; width: 160px; text-align: right; }
+    .sch-row.current { border: 1px solid #f0c040; background: rgba(240,192,64,0.06); }
+  </style>
+</head>
+<body>
+
+<div class="view v-waiting active" id="vWaiting">
+  <h1>판타지 공화국</h1>
+  <p>컨트롤러에서 시작하면 화면이 표시됩니다</p>
+</div>
+
+<div class="view v-script" id="vScript">
+  <div class="round-badge" id="sBadge"></div>
+  <div class="speaker-label" id="sSpeaker"></div>
+  <div class="main-text" id="sText"></div>
+  <div class="progress-bar" id="sProgress"></div>
+</div>
+
+<div class="view v-timer" id="vTimer">
+  <div class="timer-label">자유 시간</div>
+  <div class="timer-num" id="tNum">5:00</div>
+</div>
+
+<div class="view v-scoreboard" id="vScoreboard">
+  <h2>순위표</h2>
+  <div id="sbList"></div>
+</div>
+
+<div class="view v-stocks" id="vStocks">
+  <h2>주식 시세</h2>
+  <div id="stList"></div>
+</div>
+
+<div class="view v-vote" id="vVote">
+  <h2 id="voteTitle">대통령 선거</h2>
+  <div class="vote-cand" id="voteList"></div>
+</div>
+
+<div class="view v-horse" id="vHorse">
+  <h2>경마 결과</h2>
+  <div class="horse-result" id="horseResult"></div>
+  <div class="horse-detail" id="horseDetail"></div>
+</div>
+
+<div class="view v-kakao" id="vKakao">
+  <div class="kk-icon">💬</div>
+  <div class="kk-title">카카오톡 투표에 참여하세요!</div>
+  <div class="kk-sub">단체 채팅방 투표링크를 확인하세요</div>
+  <div class="kk-cands">
+    <div class="kk-cand" style="background:rgba(106,176,255,0.15);color:#6ab0ff">박준혁</div>
+    <div class="kk-cand" style="background:rgba(106,255,154,0.15);color:#6aff9a">정상린</div>
+    <div class="kk-cand" style="background:rgba(208,106,255,0.15);color:#d06aff">장연우</div>
+  </div>
+  <div class="kk-sub" style="font-size:17px;color:#444">대통령 후보 중 한 명을 선택하세요</div>
+</div>
+
+<div class="view v-quiz" id="vQuiz">
+  <div class="quiz-title" id="quizTitle">몸풀기 퀴즈</div>
+  <div class="quiz-badge" id="quizBadge">7시 전까지 제출</div>
+
+  <div class="quiz-steps" id="quizSteps">
+    <div class="quiz-step">
+      <div class="quiz-step-num">①</div>
+      <div class="quiz-step-body">
+        <b>7시 전까지 <em>박규동에게 1:1 카카오톡</em>으로 숫자를 보내세요</b>
+        <span>단체톡 X — 박규동에게 <em>개인 카톡</em>으로 보내야 합니다</span>
+      </div>
+    </div>
+    <div class="quiz-step">
+      <div class="quiz-step-num">②</div>
+      <div class="quiz-step-body">
+        <b><em>0 ~ 100</em> 사이 정수 하나를 선택하세요</b>
+        <span>소수점 X · 범위 초과 X · 1인 1개만 제출</span>
+      </div>
+    </div>
+    <div class="quiz-step">
+      <div class="quiz-step-num">③</div>
+      <div class="quiz-step-body">
+        <b>카톡을 보낸 참가자들의 제출 값의 <em>평균의 절반</em> 에 가장 가까운 사람이 승리!</b>
+        <span>예) 평균이 60이면 목표값은 30 — 30에 가장 가까운 숫자를 낸 사람</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-highlight" id="quizHighlight">
+    <b>🏆 상금 — 10만 루블 가치의 재화</b><br>
+    <span>승자들이 메인매치 내에서 <b style="color:#fff">균등 분배</b>하여 소지</span><br>
+    <span style="font-size:13px;color:#444">게임 내에서 양도 가능</span>
+  </div>
+
+  <div class="quiz-result-wrap" id="quizResultWrap" style="display:none">
+    <div class="quiz-winner" id="quizWinner"></div>
+    <div class="quiz-stats" id="quizStats"></div>
+  </div>
+</div>
+
+<div class="view v-schedule" id="vSchedule">
+  <h2>🕐 타임테이블</h2>
+  <div id="schList"></div>
+</div>
+
+<script>
+const ch = new BroadcastChannel('fantasy-republic');
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+ch.onmessage = (e) => {
+  const { type, data } = e.data;
+
+  if (type === 'black') { showView('vWaiting'); return; }
+
+  if (type === 'show') {
+    showView('vScript');
+    document.getElementById('sBadge').textContent = data.round || '';
+    const sl = document.getElementById('sSpeaker');
+    sl.textContent = '';
+    sl.className = 'speaker-label';
+    sl.style.display = 'none';
+    const mt = document.getElementById('sText');
+    mt.innerHTML = data.html || '';
+    mt.style.animation = 'none'; mt.offsetHeight; mt.style.animation = '';
+    document.getElementById('sProgress').style.width = data.progress + '%';
+  }
+
+  if (type === 'timer') {
+    showView('vTimer');
+    const m = Math.floor(data.seconds / 60);
+    const s = data.seconds % 60;
+    const el = document.getElementById('tNum');
+    el.textContent = m + ':' + String(s).padStart(2, '0');
+    el.classList.toggle('urgent', data.seconds <= 10);
+  }
+
+  if (type === 'scoreboard') {
+    showView('vScoreboard');
+    const list = document.getElementById('sbList');
+    const maxNW = Math.max(...data.players.map(p => p.netWorth), 1);
+    list.innerHTML = data.players.map((p, i) => {
+      const pct = Math.max(0, p.netWorth / maxNW * 100);
+      const cls = i === 0 ? 'sb-row top1' : p.netWorth < 0 ? 'sb-row negative' : 'sb-row';
+      const color = p.netWorth < 0 ? '#ff2d78' : i === 0 ? '#ffd700' : '#f0c040';
+      return `<div class="${cls}">
+        <div class="sb-rank">${i+1}</div>
+        <div class="sb-name">${p.name}</div>
+        <div class="sb-bar-wrap"><div class="sb-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+        <div class="sb-gold" style="color:${color}">${p.netWorth.toLocaleString()}G</div>
+        <div class="sb-party">${p.party || ''}</div>
+      </div>`;
+    }).join('');
+  }
+
+  if (type === 'stocks') {
+    showView('vStocks');
+    const icons = {'철벽건설':'🏗️','레드포지':'🔫','네오텍':'💻','볼트에너지':'⚡','미라주엔터':'🎪','블랙마켓':'🕳️'};
+    const list = document.getElementById('stList');
+    list.innerHTML = data.stocks.map(s => {
+      return `<div class="stock-row">
+        <div class="stock-icon">${icons[s.name]||''}</div>
+        <div class="stock-name">${s.name}</div>
+        <div class="stock-price" style="color:#f0c040">${s.price}G</div>
+      </div>`;
+    }).join('');
+  }
+
+  if (type === 'vote') {
+    showView('vVote');
+    document.getElementById('voteTitle').textContent = data.title || '투표';
+    const total = Math.max(data.candidates.reduce((a,c) => a + c.count, 0), 1);
+    const colors = {'박준혁':'#6ab0ff','정상린':'#6aff9a','장연우':'#d06aff','유지':'#6aff9a','탄핵':'#ff4444','기권':'#555'};
+    document.getElementById('voteList').innerHTML = data.candidates.map(c => {
+      const pct = (c.count / total * 100).toFixed(0);
+      return `<div class="vote-row">
+        <div class="vote-name">${c.name}</div>
+        <div class="vote-bar-outer"><div class="vote-bar-inner" style="width:${pct}%;background:${colors[c.name]||'#f0c040'}"></div></div>
+        <div class="vote-count">${c.count}</div>
+        <div class="vote-pct">${pct}%</div>
+      </div>`;
+    }).join('');
+  }
+
+  if (type === 'horse') {
+    showView('vHorse');
+    const mult = [0, 2, 3, 5, 10];
+    document.getElementById('horseResult').textContent = '🐎 ' + data.winner + '번 말!';
+    document.getElementById('horseDetail').textContent = '배당 ×' + mult[data.winner];
+  }
+
+  if (type === 'kakao') {
+    showView('vQuiz');
+    document.getElementById('quizTitle').textContent = '💬 카톡 투표 퀴즈';
+    document.getElementById('quizBadge').textContent = '7:00 — 7:10';
+    document.getElementById('quizSteps').innerHTML = `
+      <div class="quiz-step">
+        <div class="quiz-step-num">①</div>
+        <div class="quiz-step-body">
+          <b>단체 카카오톡 채팅방 투표에 참여하세요</b>
+          <span>링크가 공유됩니다 — 투표 종료 전까지 <em>변경 가능</em></span>
+        </div>
+      </div>
+      <div class="quiz-step">
+        <div class="quiz-step-num">②</div>
+        <div class="quiz-step-body">
+          <b><em>0 ~ 100</em> 사이 숫자 하나를 선택해 투표하세요</b>
+          <span>투표는 종료 시까지 자유롭게 수정 가능합니다</span>
+        </div>
+      </div>
+      <div class="quiz-step">
+        <div class="quiz-step-num">③</div>
+        <div class="quiz-step-body">
+          <b>투표 종료 시점 전체 평균 × 0.5 에 가장 가까운 사람이 승리!</b>
+          <span>여러 명이 동점이면 <em>균등 분배</em></span>
+        </div>
+      </div>`;
+    document.getElementById('quizSteps').style.display = 'flex';
+    document.getElementById('quizHighlight').innerHTML = `<b>🏆 상금 — 5만 루블 가치의 아이템</b><br><span>승자들이 메인매치 내에서 <b style="color:#fff">균등 분배</b>하여 소지</span><br><span style="font-size:13px;color:#444">게임 내에서 양도 가능</span>`;
+    document.getElementById('quizHighlight').style.display = 'block';
+    document.getElementById('quizResultWrap').style.display = 'none';
+  }
+
+  if (type === 'quiz') {
+    showView('vQuiz');
+    if (data.phase === 'input') {
+      document.getElementById('quizTitle').textContent = data.isKakao ? '💬 카톡 투표 퀴즈' : '🎯 몸풀기 퀴즈';
+      document.getElementById('quizBadge').textContent = data.isKakao ? '7:00 — 7:10' : '6:50 — 7:00';
+      document.getElementById('quizSteps').style.display = 'flex';
+      document.getElementById('quizHighlight').style.display = 'block';
+      document.getElementById('quizResultWrap').style.display = 'none';
+    } else if (data.phase === 'result') {
+      document.getElementById('quizSteps').style.display = 'flex';
+      document.getElementById('quizHighlight').style.display = 'block';
+      document.getElementById('quizResultWrap').style.display = 'block';
+      document.getElementById('quizWinner').textContent = '🏆 ' + data.winner;
+      document.getElementById('quizStats').innerHTML = `평균 <em>${data.avg}</em> &nbsp;→&nbsp; 목표값 <em>${data.target}</em>에 가장 가까운 정답`;
+    }
+  }
+
+  if (type === 'schedule') {
+    showView('vSchedule');
+    const now = new Date();
+    const rows = [
+      {time:'6:50~7:00', round:'—',  label:'몸풀기 퀴즈', who:'박규동', start:[6,50], end:[7,0]},
+      {time:'7:00~7:10', round:'—',  label:'카톡 투표', who:'박규동', start:[7,0], end:[7,10]},
+      {time:'7:10~7:30', round:'0R+1R', label:'프롤로그 + 대통령 선거', who:'박규동', start:[7,10], end:[7,30]},
+      {time:'7:30~8:00', round:'2R', label:'📈 주식 오픈', who:'박준혁 / 딜러룸', start:[7,30], end:[8,0]},
+      {time:'8:00~8:30', round:'3R', label:'🐎 경마 오픈', who:'정상린 / 서재', start:[8,0], end:[8,30]},
+      {time:'8:30~9:00', round:'4R', label:'🏦 대출 + 🎰 도박장 오픈', who:'장연우 / 게임룸 · 박규동 / 복도', start:[8,30], end:[9,0]},
+      {time:'9:00~9:30', round:'5R', label:'🎫 복권방 오픈', who:'박규동 / 복도', start:[9,0], end:[9,30]},
+      {time:'9:30~10:00',round:'6R', label:'📢 플레이어 출마 가능', who:'전체', start:[9,30], end:[10,0]},
+      {time:'10:00~10:30',round:'7R',label:'🔫 강도 시스템 오픈', who:'전체', start:[10,0], end:[10,30]},
+      {time:'10:30~11:00',round:'8R',label:'⚠️ 마지막 라운드 · 밸런스 조정', who:'박규동', start:[10,30], end:[11,0]},
+      {time:'11:00~',    round:'9R', label:'엔딩 — VIP룸 + 오징어게임', who:'박규동', start:[11,0], end:[25,0]},
+    ];
+    const h=now.getHours(), m=now.getMinutes();
+    const nowMins = h*60+m;
+    document.getElementById('schList').innerHTML = rows.map(r=>{
+      const sm = r.start[0]*60+r.start[1], em = r.end[0]*60+r.end[1];
+      const cur = nowMins >= sm && nowMins < em ? ' current' : '';
+      return `<div class="sch-row${cur}">
+        <div class="sch-time">${r.time}</div>
+        <div class="sch-round">${r.round}</div>
+        <div class="sch-label">${r.label}</div>
+        <div class="sch-who">${r.who}</div>
+      </div>`;
+    }).join('');
+  }
+};
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();ch.postMessage({type:'key',key:'next'});}
+  if(e.key==='ArrowLeft'){e.preventDefault();ch.postMessage({type:'key',key:'prev'});}
+  if(e.key==='b'||e.key==='B'){ch.postMessage({type:'key',key:'black'});}
+});
+</script>
+</body>
+</html>

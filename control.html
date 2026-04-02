@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>판타지 공화국 — 컨트롤러</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:#0a0a0f;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:13px}
+
+/* TOP BAR */
+.top{background:#0e0e18;border-bottom:1px solid #1a1a2e;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.top .logo{font-weight:900;font-size:13px;color:#f0c040}
+.top .acts{display:flex;gap:6px;align-items:center}
+.btn{background:#1a1a2e;border:1px solid #2a2a3e;color:#888;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
+.btn:hover{border-color:#f0c040;color:#f0c040}
+.btn.on{background:#f0c040;color:#000;border-color:#f0c040}
+.btn.danger{border-color:#ff4444;color:#ff4444}
+.btn.danger:hover{background:#ff4444;color:#fff}
+
+/* MAIN TABS */
+.tabs{background:#0e0e18;border-bottom:1px solid #1a1a2e;padding:4px 16px;display:flex;gap:2px;flex-shrink:0}
+.tab{background:none;border:none;color:#444;padding:6px 14px;border-radius:8px 8px 0 0;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;border-bottom:2px solid transparent}
+.tab:hover{color:#888}
+.tab.active{color:#f0c040;border-bottom-color:#f0c040;background:rgba(240,192,64,0.05)}
+
+/* LAYOUT */
+.layout{flex:1;display:flex;overflow:hidden}
+.main-area{flex:1;overflow-y:auto;padding:16px}
+.side{width:280px;flex-shrink:0;border-left:1px solid #1a1a2e;display:flex;flex-direction:column;overflow-y:auto;padding:12px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* SIDE SECTIONS */
+.side-title{font-size:10px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:1px;margin:12px 0 6px}
+.side-title:first-child{margin-top:0}
+.preview-box{background:#000;border:1px solid #1a1a2e;border-radius:6px;padding:12px;font-size:11px;color:#e0e0e0;line-height:1.8;min-height:60px;max-height:300px;overflow:auto}
+.preview-box em{color:#f0c040;font-style:normal;font-weight:700}
+.preview-box .rub{color:#666;font-size:10px}
+.preview-box .q{color:#888;font-style:italic}
+
+/* TIMER */
+.timer-big{font-size:36px;font-weight:900;color:#f0c040;text-align:center;font-variant-numeric:tabular-nums}
+.timer-big.urgent{color:#ff4444}
+.timer-btns{display:flex;gap:4px;margin-top:6px}
+.timer-btns .btn{flex:1;text-align:center}
+
+/* PRESENT MODE */
+.mode-btns{display:flex;flex-wrap:wrap;gap:4px}
+.mode-btn{flex:1;min-width:70px;padding:5px 4px;border-radius:6px;border:1px solid #1e1e30;background:none;color:#555;font-size:10px;cursor:pointer;font-family:inherit;text-align:center}
+.mode-btn:hover{color:#aaa;border-color:#333}
+.mode-btn.active{color:#f0c040;border-color:#f0c040;background:rgba(240,192,64,0.05)}
+
+/* MINI SCOREBOARD */
+.mini-sb{font-size:11px}
+.mini-sb-row{display:flex;gap:6px;padding:3px 0;border-bottom:1px solid #111}
+.mini-sb-rank{color:#f0c040;font-weight:900;width:16px}
+.mini-sb-name{flex:1;color:#888}
+.mini-sb-gold{font-weight:700;color:#f0c040}
+.mini-sb-gold.neg{color:#ff2d78}
+
+/* CARDS */
+.card{background:#12121c;border:1px solid #1e1e30;border-radius:8px;padding:16px;margin:8px 0}
+.card h3{font-size:14px;font-weight:700;color:#f0c040;margin-bottom:10px}
+
+/* FORMS */
+select,input[type=text],input[type=number]{background:#0e0e18;border:1px solid #2a2a3e;color:#eee;padding:6px 10px;border-radius:6px;font-size:12px;font-family:inherit}
+select:focus,input:focus{outline:none;border-color:#f0c040}
+label{font-size:11px;color:#666;display:block;margin:6px 0 3px}
+.form-row{display:flex;gap:8px;align-items:flex-end;margin:6px 0}
+.form-row > *{flex:1}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{background:#0e0e18;color:#f0c040;font-weight:700;padding:8px;text-align:left;border-bottom:1px solid #1e1e30;position:sticky;top:0}
+.tbl td{padding:6px 8px;border-bottom:1px solid #111}
+.tbl tr:hover td{background:rgba(240,192,64,0.02)}
+.tbl .r{text-align:right}
+.tbl .gold{color:#f0c040;font-weight:700}
+.tbl .neg{color:#ff2d78}
+.tbl .party-j{color:#6ab0ff} .tbl .party-s{color:#6aff9a} .tbl .party-y{color:#d06aff}
+
+/* CUE LIST */
+.cue{padding:10px 12px;margin:3px 0;background:#12121c;border:1px solid #1e1e30;border-radius:6px;cursor:pointer;font-size:12px}
+.cue:hover{border-color:#333}
+.cue.active-cue{border-color:#f0c040;background:rgba(240,192,64,0.05)}
+.cue.sent{opacity:0.3}
+.cue-sp{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px}
+.cue-sp.narr{color:#f0c040}.cue-sp.sys{color:#6ab0ff}.cue-sp.dir{color:#555}
+.cue-sp.junhyuk{color:#6ab0ff}.cue-sp.sangrin{color:#6aff9a}.cue-sp.yeonwoo{color:#d06aff}
+.cue-sp.vip{color:#ffd700}.cue-sp.squid{color:#ff2d78}
+.cue-pv{color:#666;font-size:11px}
+.cue-memo{color:#333;font-size:10px;margin-top:3px;font-style:italic}
+
+/* ROUND TABS */
+.rtabs{display:flex;gap:3px;margin-bottom:12px;flex-wrap:wrap}
+.rtab{background:none;border:1px solid #1e1e30;color:#444;padding:3px 10px;border-radius:12px;font-size:10px;cursor:pointer;font-family:inherit}
+.rtab:hover{color:#888}
+.rtab.active{color:#f0c040;border-color:rgba(240,192,64,0.3);background:rgba(240,192,64,0.05)}
+
+/* VOTE */
+.vote-bar-o{height:24px;background:#1a1a2e;border-radius:6px;overflow:hidden;flex:1}
+.vote-bar-i{height:100%;border-radius:6px;transition:width 0.5s}
+
+/* LOG */
+.log{max-height:200px;overflow-y:auto;font-size:11px;color:#555;line-height:1.8}
+.log-entry{border-bottom:1px solid #0e0e18;padding:2px 0}
+
+/* BOTTOM */
+.bottom{background:#0e0e18;border-top:1px solid #1a1a2e;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.big-btn{padding:10px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.big-btn.prev{background:none;border:1px solid #333;color:#888}
+.big-btn.prev:hover{border-color:#f0c040;color:#f0c040}
+.big-btn.next{background:#f0c040;border:none;color:#000}
+.big-btn.next:hover{background:#ffd060}
+.big-btn:disabled{opacity:0.2;cursor:default}
+.pos{color:#444;font-size:12px;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <span class="logo">🎮 컨트롤러 — 판타지 공화국</span>
+  <div class="acts">
+    <button class="btn" onclick="openPresent()" id="presentBtn">프레젠테이션 창 열기</button>
+    <button class="btn" onclick="sendBlack()">화면 끄기</button>
+    <button class="btn" onclick="exportState()">저장</button>
+    <button class="btn" onclick="importState()">불러오기</button>
+    <button class="btn danger" onclick="if(confirm('모든 데이터를 초기화합니다?')){localStorage.removeItem('fr-state');location.reload();}">리셋</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="tScript">📜 대본</button>
+  <button class="tab" data-tab="tSchedule">🕐 타임테이블</button>
+  <button class="tab" data-tab="tPlayers">👥 플레이어</button>
+  <button class="tab" data-tab="tBank">🏦 은행</button>
+  <button class="tab" data-tab="tStocks">📈 주식</button>
+  <button class="tab" data-tab="tVote">🗳️ 투표</button>
+  <button class="tab" data-tab="tBet">🎰 베팅</button>
+</div>
+
+<div class="layout">
+<div class="main-area">
+
+<!-- ═══ TAB: SCRIPT ═══ -->
+<div class="tab-content active" id="tScript">
+  <div class="rtabs" id="rtabs"></div>
+  <div id="cueList"></div>
+</div>
+
+<!-- ═══ TAB: SCHEDULE ═══ -->
+<div class="tab-content" id="tSchedule">
+  <div class="card">
+    <h3>🕐 타임테이블</h3>
+    <table class="tbl">
+      <thead><tr><th>시간</th><th>라운드</th><th>내용</th><th>담당</th></tr></thead>
+      <tbody>
+        <tr><td style="color:#888">6:50~7:00</td><td>—</td><td>몸풀기 퀴즈</td><td style="color:#f0c040">박규동</td></tr>
+        <tr><td style="color:#888">7:00~7:10</td><td>—</td><td>카톡 투표</td><td style="color:#f0c040">박규동</td></tr>
+        <tr style="background:rgba(240,192,64,0.03)"><td style="color:#f0c040">7:10~7:30</td><td><b style="color:#f0c040">0R+1R</b></td><td>프롤로그 + 대통령 선거</td><td style="color:#f0c040">박규동</td></tr>
+        <tr><td style="color:#f0c040">7:30~8:00</td><td><b style="color:#f0c040">2R</b></td><td>📈 주식 오픈</td><td style="color:#6ab0ff">박준혁 / 딜러룸</td></tr>
+        <tr><td style="color:#f0c040">8:00~8:30</td><td><b style="color:#f0c040">3R</b></td><td>🐎 경마 오픈</td><td style="color:#6aff9a">정상린 / 서재</td></tr>
+        <tr><td style="color:#f0c040">8:30~9:00</td><td><b style="color:#f0c040">4R</b></td><td>🏦 대출 + 🎰 도박장 오픈</td><td style="color:#d06aff">장연우 / 게임룸 · 박규동 / 복도</td></tr>
+        <tr><td style="color:#f0c040">9:00~9:30</td><td><b style="color:#f0c040">5R</b></td><td>🎫 복권방 오픈</td><td style="color:#f0c040">박규동 / 복도</td></tr>
+        <tr><td style="color:#f0c040">9:30~10:00</td><td><b style="color:#f0c040">6R</b></td><td>📢 플레이어 대통령 출마 가능</td><td>전체</td></tr>
+        <tr><td style="color:#f0c040">10:00~10:30</td><td><b style="color:#f0c040">7R</b></td><td>🔫 강도 시스템 오픈</td><td>전체</td></tr>
+        <tr><td style="color:#f0c040">10:30~11:00</td><td><b style="color:#f0c040">8R</b></td><td>⚠️ 마지막 라운드 · 밸런스 조정</td><td style="color:#f0c040">박규동</td></tr>
+        <tr style="background:rgba(255,45,120,0.04)"><td style="color:#ff2d78">11:00~</td><td><b style="color:#ff2d78">9R</b></td><td>엔딩 — VIP룸 + 오징어게임</td><td style="color:#f0c040">박규동</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>🗺️ 딜러 배치도</h3>
+    <table class="tbl">
+      <thead><tr><th>공간</th><th>담당 딜러</th><th>역할</th></tr></thead>
+      <tbody>
+        <tr><td>거실</td><td style="color:#f0c040">박규동 (NPC)</td><td>메인 무대 — 게임 진행·대본</td></tr>
+        <tr><td>복도</td><td style="color:#f0c040">박규동</td><td>복권방 + 대출(은행)</td></tr>
+        <tr><td>딜러룸</td><td style="color:#6ab0ff">박준혁</td><td>주식 거래소 — 매수·매도</td></tr>
+        <tr><td>서재</td><td style="color:#6aff9a">정상린</td><td>경마 진행</td></tr>
+        <tr><td>게임룸</td><td style="color:#d06aff">장연우</td><td>도박장 운영</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>🎯 6:50~7:00 — 몸풀기 퀴즈 (카톡 1:1 DM)</h3>
+    <p style="color:#888;font-size:12px;line-height:1.8;margin-bottom:10px">
+      박규동에게 1:1 카톡으로 <b style="color:#f0c040">0~100 숫자</b> 제출 →
+      <b style="color:#f0c040">평균 × 0.5</b>에 가장 가까운 사람 승리<br>
+      🏆 상금: 해당 가치 게임 아이템 (양도 가능)
+    </p>
+    <div style="margin-bottom:6px"><button class="btn" onclick="addQuizEntry()">+ 참가자 추가</button></div>
+    <div id="quizEntries"></div>
+    <div class="form-row" style="margin-top:8px">
+      <button class="btn" onclick="calcQuiz()">결과 계산</button>
+      <span id="quizResult" style="color:#f0c040;font-weight:700;font-size:13px;margin-left:10px"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>💬 7:00~7:10 — 카톡 투표 실시간 집계</h3>
+    <p style="color:#888;font-size:12px;line-height:1.8;margin-bottom:10px">
+      단체톡 투표 (0~100) 결과를 실시간 입력 →
+      <b style="color:#f0c040">평균 × 0.5</b>에 가장 가까운 사람 승리<br>
+      🏆 상금: 해당 가치 게임 아이템 (양도 가능) · 다수이면 균등 분배
+    </p>
+    <div style="margin-bottom:6px"><button class="btn" onclick="addPollEntry()">+ 투표 입력</button></div>
+    <div id="pollEntries"></div>
+    <div id="pollLive" style="margin-top:8px;padding:8px;background:#0e0e18;border-radius:6px;font-size:12px;color:#555;min-height:28px"></div>
+    <div class="form-row" style="margin-top:8px">
+      <button class="btn" onclick="calcPoll()">결과 계산</button>
+      <span id="pollResult" style="color:#f0c040;font-weight:700;font-size:13px;margin-left:10px"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📣 프레젠테이션 전송</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <button class="btn" onclick="sendQuizScreen()" style="padding:10px;font-size:12px">🎯 6:50 — 몸풀기 퀴즈 화면</button>
+      <button class="btn" onclick="ch.postMessage({type:'kakao'})" style="padding:10px;font-size:12px">💬 7:00 — 카톡 투표 화면</button>
+      <button class="btn" onclick="sendScheduleToPresent()" style="padding:10px;font-size:12px">🕐 타임테이블 전체 보기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB: PLAYERS ═══ -->
+<div class="tab-content" id="tPlayers">
+  <div class="card">
+    <h3>플레이어 등록</h3>
+    <div class="form-row">
+      <div><label>이름</label><input type="text" id="pName" placeholder="이름 입력"></div>
+      <div><label>당</label>
+        <select id="pParty"><option value="">무소속</option><option value="강철방위당">⚔️ 강철방위당</option><option value="혁신개발당">🧪 혁신개발당</option><option value="암흑이익당">🕷️ 암흑이익당</option></select>
+      </div>
+      <div><label>&nbsp;</label><button class="btn" onclick="addPlayer()">추가</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>전원 작업</h3>
+    <div class="form-row">
+      <button class="btn" onclick="bulkGold(1000)">전원 1000G 지급</button>
+      <button class="btn" onclick="bulkTax()">세금 일괄 징수</button>
+      <button class="btn" onclick="bulkBonus()">1위 보너스 지급</button>
+      <button class="btn" onclick="bulkInterest()">이자 일괄 적용</button>
+      <button class="btn" onclick="bulkRedistribute()">재분배 (장연우)</button>
+    </div>
+  </div>
+  <table class="tbl">
+    <thead><tr><th>#</th><th>이름</th><th>당</th><th class="r">골드</th><th class="r">주식</th><th class="r">빚</th><th class="r">순자산</th><th>관리</th></tr></thead>
+    <tbody id="playerTable"></tbody>
+  </table>
+</div>
+
+<!-- ═══ TAB: BANK ═══ -->
+<div class="tab-content" id="tBank">
+  <div class="card">
+    <h3>💰 대출</h3>
+    <div class="form-row">
+      <div><label>플레이어</label><select id="loanPlayer" onchange="updateLoanMax()"></select></div>
+      <div><label>금액 (100G 단위)</label><input type="number" id="loanAmt" step="100" min="100"></div>
+      <div><label>한도</label><span id="loanMax" style="color:#f0c040;font-weight:700">-</span></div>
+      <div><label>&nbsp;</label><button class="btn" onclick="doLoan()">대출</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>💸 상환</h3>
+    <div class="form-row">
+      <div><label>플레이어</label><select id="repayPlayer" onchange="updateRepayInfo()"></select></div>
+      <div><label>현재 빚</label><span id="repayDebt" style="color:#ff2d78;font-weight:700">-</span></div>
+      <div><label>금액</label><input type="number" id="repayAmt" step="100" min="100"></div>
+      <div><label>&nbsp;</label><button class="btn" onclick="doRepay()">상환</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📤 이체</h3>
+    <div class="form-row">
+      <div><label>보내는 사람</label><select id="txFrom"></select></div>
+      <div><label>받는 사람</label><select id="txTo"></select></div>
+      <div><label>금액</label><input type="number" id="txAmt" step="100" min="100"></div>
+      <div><label>&nbsp;</label><button class="btn" onclick="doTransfer()">이체</button></div>
+    </div>
+    <p style="font-size:11px;color:#555;margin-top:6px">수수료 5% (최소 10G). 장연우 당원 면제.</p>
+  </div>
+  <div class="card">
+    <h3>거래 내역</h3>
+    <div class="log" id="bankLog"></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: STOCKS ═══ -->
+<div class="tab-content" id="tStocks">
+  <div class="card">
+    <h3>주가 설정</h3>
+    <div class="form-row" style="margin-bottom:8px">
+      <div><label>대통령</label>
+        <select id="presidentSel" onchange="ST.president=this.value;save();renderStocks()">
+          <option value="">미정</option>
+          <option value="junhyuk">⚔️ 박준혁</option>
+          <option value="sangrin">🧪 정상린</option>
+          <option value="yeonwoo">🕷️ 장연우</option>
+        </select>
+      </div>
+      <div><label>&nbsp;</label><button class="btn" onclick="applyStockChanges()">변동 적용</button></div>
+      <div><label>&nbsp;</label><button class="btn" onclick="sendStocks()">주가 화면 표시</button></div>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>회사</th><th class="r">현재가</th><th class="r">변동(G)</th><th class="r">보정</th><th class="r">새 가격</th></tr></thead>
+      <tbody id="stockTable"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>매수 / 매도</h3>
+    <div class="form-row">
+      <div><label>플레이어</label><select id="tradePlayer"></select></div>
+      <div><label>회사</label><select id="tradeCo"></select></div>
+      <div><label>수량</label><input type="number" id="tradeQty" min="1" max="5" value="1"></div>
+      <div><label>&nbsp;</label><button class="btn" onclick="doTrade('buy')">매수</button></div>
+      <div><label>&nbsp;</label><button class="btn" onclick="doTrade('sell')">매도</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB: VOTE ═══ -->
+<div class="tab-content" id="tVote">
+  <div class="card">
+    <h3>🗳️ 선거</h3>
+    <div class="form-row">
+      <button class="btn" onclick="addVote('junhyuk')">⚔️ 박준혁 +1</button>
+      <button class="btn" onclick="addVote('sangrin')">🧪 정상린 +1</button>
+      <button class="btn" onclick="addVote('yeonwoo')">🕷️ 장연우 +1</button>
+      <button class="btn" onclick="addVote('abstain')">기권 +1</button>
+      <button class="btn danger" onclick="resetVotes()">리셋</button>
+      <button class="btn" onclick="sendVoteElection()">화면 표시</button>
+    </div>
+    <div id="voteDisplay" style="margin-top:12px"></div>
+  </div>
+  <div class="card">
+    <h3>탄핵 투표</h3>
+    <div class="form-row">
+      <button class="btn" onclick="addImpeach('keep')">유지 +1</button>
+      <button class="btn" onclick="addImpeach('remove')">탄핵 +1</button>
+      <button class="btn danger" onclick="ST.impeachment={keep:0,remove:0};save();renderVote()">리셋</button>
+      <button class="btn" onclick="sendVoteImpeach()">화면 표시</button>
+    </div>
+    <div id="impeachDisplay" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: BETTING ═══ -->
+<div class="tab-content" id="tBet">
+  <div id="betLock" style="padding:40px;text-align:center;color:#555">
+    <div style="font-size:40px;margin-bottom:12px">🔒</div>
+    <div style="font-size:14px;font-weight:700">3라운드(경마)부터 사용 가능</div>
+    <div style="font-size:12px;margin-top:8px;color:#333">대본에서 3라운드 이후로 넘어가면 자동 해제됩니다</div>
+    <button class="btn" style="margin-top:12px" onclick="document.getElementById('betLock').style.display='none';document.getElementById('betContent').style.display='block'">수동 해제</button>
+  </div>
+  <div id="betContent" style="display:none">
+  <div class="card">
+    <h3>🏇 경마</h3>
+    <div class="form-row">
+      <div><label>플레이어</label><select id="hrPlayer"></select></div>
+      <div><label>말</label><select id="hrHorse"><option value="1">1번 ×2</option><option value="2">2번 ×3</option><option value="3">3번 ×5</option><option value="4">4번 ×10</option></select></div>
+      <div><label>베팅 (100~200G)</label><input type="number" id="hrAmt" min="100" max="200" step="100" value="100"></div>
+      <div><label>&nbsp;</label><button class="btn" onclick="placeHorseBet()">베팅</button></div>
+    </div>
+    <div id="horseBets" style="margin-top:8px"></div>
+    <div class="form-row" style="margin-top:12px">
+      <div><label>우승 말</label><select id="hrWinner"><option value="1">1번</option><option value="2">2번</option><option value="3">3번</option><option value="4">4번</option></select></div>
+      <div><label>&nbsp;</label><button class="btn on" onclick="settleHorse()">결과 정산</button></div>
+      <div><label>&nbsp;</label><button class="btn" onclick="sendHorse()">화면 표시</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>🎰 홀짝</h3>
+    <div class="form-row">
+      <div><label>플레이어</label><select id="gePlayer"></select></div>
+      <div><label>선택</label><select id="geChoice"><option value="odd">홀</option><option value="even">짝</option></select></div>
+      <div><label>베팅 (100~500G)</label><input type="number" id="geAmt" min="100" max="500" step="100" value="100"></div>
+      <div><label>결과</label><select id="geResult"><option value="odd">홀</option><option value="even">짝</option></select></div>
+      <div><label>&nbsp;</label><button class="btn on" onclick="settleGamble()">정산</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>🎟️ 복권</h3>
+    <div class="form-row">
+      <div><label>플레이어</label><select id="lotPlayer"></select></div>
+      <div><label>&nbsp;</label><button class="btn on" onclick="drawLottery()">복권 구매 & 추첨 (50G)</button></div>
+    </div>
+    <div id="lotResult" style="margin-top:8px;font-size:14px"></div>
+  </div>
+  <div class="card">
+    <h3>베팅 내역</h3>
+    <div class="log" id="betLog"></div>
+  </div>
+  </div><!-- /betContent -->
+</div>
+
+</div><!-- /main-area -->
+
+<!-- SIDEBAR -->
+<div class="side">
+  <div class="side-title">프레젠테이션 모드</div>
+  <div class="mode-btns">
+    <button class="mode-btn active" data-mode="script" onclick="setMode('script')">대본</button>
+    <button class="mode-btn" data-mode="timer" onclick="setMode('timer')">타이머</button>
+    <button class="mode-btn" data-mode="scoreboard" onclick="setMode('scoreboard')">순위</button>
+    <button class="mode-btn" data-mode="stocks" onclick="setMode('stocks')">주가</button>
+    <button class="mode-btn" data-mode="vote" onclick="setMode('vote')">투표</button>
+  </div>
+
+  <div class="side-title">현재 화면</div>
+  <div class="preview-box" id="previewBox">프레젠테이션 창을 열고 시작하세요</div>
+
+  <div class="side-title">타이머</div>
+  <div class="timer-big" id="timerDisp">5:00</div>
+  <div class="timer-btns">
+    <button class="btn" onclick="startTimer(120)">2분</button>
+    <button class="btn" onclick="startTimer(180)">3분</button>
+    <button class="btn" onclick="startTimer(300)">5분</button>
+    <button class="btn" onclick="stopTimer()">정지</button>
+  </div>
+
+  <div class="side-title">순위</div>
+  <div class="mini-sb" id="miniSb"></div>
+
+  <div class="side-title" style="margin-top:16px">단축키</div>
+  <div style="font-size:10px;color:#333;line-height:1.8">
+    <b style="color:#666">→ Space</b> 다음 <b style="color:#666">←</b> 이전<br>
+    <b style="color:#666">B</b> 화면끄기 <b style="color:#666">T</b> 5분타이머 <b style="color:#666">S</b> 정지
+  </div>
+</div>
+</div><!-- /layout -->
+
+<div class="bottom">
+  <button class="big-btn prev" id="prevBtn" onclick="goCue(curCue-1)">← 이전</button>
+  <span class="pos" id="posInd"></span>
+  <button class="big-btn next" id="nextBtn" onclick="goCue(curCue+1)">다음 →</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// [1] STATE & PERSISTENCE
+// ═══════════════════════════════════════════
+let ST = {
+  round: 0, president: '',
+  players: [],
+  stocks: {
+    '철벽건설':{price:200,history:[200],sector:'construction'},
+    '레드포지':{price:200,history:[200],sector:'military'},
+    '네오텍':{price:200,history:[200],sector:'tech'},
+    '볼트에너지':{price:200,history:[200],sector:'energy'},
+    '미라주엔터':{price:200,history:[200],sector:'entertainment'},
+    '블랙마켓':{price:200,history:[200],sector:'blackmarket'},
+  },
+  votes:{junhyuk:0,sangrin:0,yeonwoo:0,abstain:0},
+  impeachment:{keep:0,remove:0},
+  horseBets:[], horseWinner:0,
+  bankLog:[], betLog:[]
+};
+function save(){localStorage.setItem('fr-state',JSON.stringify(ST))}
+function load(){const s=localStorage.getItem('fr-state');if(s)ST=JSON.parse(s)}
+function exportState(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(ST,null,2)]));a.download='fantasy-republic-save.json';a.click()}
+function importState(){const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{ST=JSON.parse(t);save();location.reload()})};i.click()}
+
+// ═══════════════════════════════════════════
+// [2] SCRIPT DATA
+// ═══════════════════════════════════════════
+const SCRIPT=[
+// ── 프리게임 ──
+{r:'몸풀기 퀴즈',ri:0,sp:'연출',c:'dir',h:'[화면: 몸풀기 퀴즈 안내]',_action:'quiz',m:'→ 프레젠테이션: 몸풀기 퀴즈 화면 표시'},
+{r:'카톡 투표',ri:1,sp:'',c:'',h:'<em>카톡 투표 퀴즈</em><br><br>단체톡 투표링크를 확인하세요.<br><em>0~100</em> 중 하나를 선택해 투표해 주세요.<br><span class="rub">투표는 종료 전까지 변경 가능합니다</span><br><br>📌 투표 종료 시점의 전체 <em>평균의 절반</em>에 가장 가까운 숫자를 선택하면 승리!<br>🏆 상금: <em>5만 루블</em> 가치의 게임 재화의 <em>균등 분배</em><br><em>게임 내에서 양도 가능</em>',m:'→ 카톡 투표 링크 공유 · 타임테이블 탭에서 실시간 집계'},
+// ── 0R+1R 프롤로그+선거 (7:10~7:30) ──
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'연출',c:'dir',h:'화면: 무너진 도시. 먼지와 잿더미.<br>BGM: 낮고 무거운 앰비언트.'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'내레이션',c:'narr',h:'세계는… <em>멸망했습니다.</em><br><br>국가는 붕괴했고, 질서는 사라졌으며,<br>법은 더 이상 존재하지 않습니다.'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'연출',c:'dir',h:'폭발 흔적, 붕괴된 건물, 버려진 차량.<br>3초 정적. 바람 소리.'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'내레이션',c:'narr',h:'하지만…<br><br><em>인류는 멸망하지 않았습니다.</em><br><br>여러분은, 그 마지막 생존자들입니다.'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'연출',c:'dir',h:'도시가 재건되는 모습. BGM 고조.'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'내레이션',c:'narr',h:'그리고 지금,<br>여러분은 새로운 국가에 입장합니다.'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'연출',c:'dir',h:'타이틀 "판타지 공화국" 등장.'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'내레이션',c:'narr',h:'이곳은 <em>판타지 공화국.</em><br><br>이 나라에는 왕이 없습니다.<br>지배자도, 정해진 규칙도 없습니다.<br><br>오직 하나만 존재합니다.<br><br><em>돈.</em><br><br>이곳에서 돈은 단순한 자원이 아닙니다.<br><em>생존이며, 기회이며, 권력입니다.</em>'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'박규동',c:'narr',h:'저는 <em>박규동</em>.<br><br>이 시스템의 <em>AI</em>입니다.<br><br>핵전쟁이 일어나고, 모든 것이 무너졌을 때<br>이 시스템을 통해 여러분은 살아남았습니다.<br><br>그리고 저는… <em>실체의 형체로</em> 나타났습니다.<br><br>저는 이 공화국의 <em>시스템이자, 관리자이자, 진행자</em>입니다.<br>저를 통해 모든 것이 운영됩니다.'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'시스템',c:'sys',h:'여러분은 전부 <em>1,000골드</em> <span class="rub">(50,000루블)</span>를 가지고<br>게임을 시작합니다.<br><br>⚠️ 각자 <em>마이너스 한도</em>가 정해져 있습니다.<br>그 이하로는 절대 내려갈 수 없습니다.',m:'→ 1,000G 현금 배분 + 마이너스 한도 안내'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'시스템',c:'sys',h:'📌 <em>당원 가입</em> — <em>100G</em><br>무소속도 가능. 정당 이적 시 100G 추가.<br><br>자신이 속한 당이 당선되면 → <em>주식 정보 추가 제공</em>',m:'→ 당원 가입 접수'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'내레이션',c:'narr',h:'여러분은 선택해야 합니다.<br>협력할 것인지, 속일 것인지, 지배할 것인지.<br><br><em>누가 이 공화국을 이끌 것인가.</em>'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'내레이션',c:'narr',h:'인류를 지켜낸 세 명의 지도자가 있습니다.<br>곧, 세 명의 후보가 공개됩니다.'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'박준혁',c:'junhyuk',h:'<em>⚔️ 박준혁 — 강철방위당</em><br><br><span class="q">"질서 없는 자유는 혼돈일 뿐이다."</span><br><br>구 시대의 전략 참모 출신.<br>폐허 속에서 물자 수송 루트를 확보하고<br>무역 체계를 재건한 인물.'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'정상린',c:'sangrin',h:'<em>🧪 정상린 — 혁신개발당</em><br><br><span class="q">"성장은 선택이 아니라 필수다."</span><br><br>국가 데이터센터 수석 연구원.<br>생존자 네트워크를 구축하고<br>자원 배분 시스템을 설계한 인물.'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'장연우',c:'yeonwoo',h:'<em>🕷️ 장연우 — 암흑이익당</em><br><br><span class="q">"누군가 잃어야, 누군가는 얻는다."</span><br><br>지하 벙커에서 사람들을 모아<br>독자적인 생존 커뮤니티를 이끌어온 인물.'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'시스템',c:'sys',h:'투표 시작. <em>비공개</em> 진행.',m:'→ 투표'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'내레이션',c:'narr',h:'초대 대통령은…<br><br><em>[당선자 이름]</em>'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'시스템',c:'sys',h:'대통령 당선 후 박규동에게 DM:<br><em>주식 1개 올릴 것 + 1개 내릴 것</em> 선택 → 바로 적용'},
+{r:'0R+1R — 프롤로그+선거',ri:2,sp:'시스템',c:'sys',h:'📌 <em>모든 재화·아이템은 자유롭게 양도 가능</em><br><br>모든 게임은 라운드 종료 <em>5분 전</em>에 마감됩니다.'},
+// ── 2R 주식 오픈 (7:30~8:00) ──
+{r:'2R — 주식 오픈',ri:3,sp:'시스템',c:'sys',h:'📈 <em>주식 시장 오픈</em><br><br>🏗️ <em>철벽건설</em> / 🔫 <em>레드포지</em> / 💻 <em>네오텍</em><br>⚡ <em>볼트에너지</em> / 🎪 <em>미라주엔터</em> / 🕳️ <em>블랙마켓</em><br><br>전부 1주 <em>200G</em>'},
+{r:'2R — 주식 오픈',ri:3,sp:'시스템',c:'sys',h:'📌 <em>주식 규칙</em><br><br>• 10분마다 주가 변동 (07:35부터)<br>• <em>딜러룸(박준혁)</em>에서 매수/매도<br>• 딜러룸 체류 <em>10초</em>, <em>5초</em> 내 수량 선언<br>• 정보 카드 1장 배분 — <em>거짓 카드 주의</em>',m:'→ 카드 배분'},
+{r:'2R — 주식 오픈',ri:3,sp:'시스템',c:'sys',h:'정보거래소: 추가 주식 정보를 <em>돈 주고 구매</em> 가능'},
+// ── 3R 경마 오픈 (8:00~8:30) ──
+{r:'3R — 경마 오픈',ri:4,sp:'시스템',c:'sys',h:'🐎 <em>경마장 오픈</em> — 정상린 / 서재<br><br>8마리 말 (1~8번) · 레일 30칸<br>주사위 굴려서 순차 전진'},
+{r:'3R — 경마 오픈',ri:4,sp:'시스템',c:'sys',h:'📌 <em>경마 규칙</em><br><br>• 단승/연승/복승/쌍승 등 실제 경마 베팅 방식<br>• 모든 경우의 베팅카드 <em>딱 1장씩</em> 판매 (선착순)<br>• 맞추기 어려운 조합 = 카드 가격 더 저렴<br>• 같은 카드 동시 구매 → <em>경매</em><br>• 라운드 종료 <em>5분 전</em>까지만 구매 가능'},
+{r:'3R — 경마 오픈',ri:4,sp:'시스템',c:'sys',h:'🎠 <em>말 아이템</em><br><br>• 주사위 2번 굴림 (합산)<br>• 2번 굴려서 높은 쪽<br>• 2번 굴려서 낮은 쪽<br>• 굴린값 +1 전진<br><br>이미 아이템 있는 말에 추가 시 더 비쌈<br><em>대통령이 가격/세율 실시간 조정 가능</em>'},
+// ── 4R 대출+도박 오픈 (8:30~9:00) ──
+{r:'4R — 대출+도박 오픈',ri:5,sp:'시스템',c:'sys',h:'🏦 <em>은행 오픈</em> — 박규동 / 복도<br><br>• <em>대출</em>: 빌리면 이자 발생<br>• <em>예금</em>: 맡기기 가능 (영구적) — 빼려면 이자 필요<br><br>⚠️ 예금은 안전하지 않을 수 있습니다…'},
+{r:'4R — 대출+도박 오픈',ri:5,sp:'시스템',c:'sys',h:'🎰 <em>도박장 오픈</em> — 장연우 / 게임룸<br><br>종목 3개 중 택 1 운영:<br>• <em>블랙잭</em><br>• <em>바카라</em><br>• <em>주사위 3개 예측</em><br><br><span class="rub">현재 NPC 대통령 → 종목/보상률 변경 불가</span>'},
+// ── 5R 복권방 오픈 (9:00~9:30) ──
+{r:'5R — 복권방 오픈',ri:6,sp:'시스템',c:'sys',h:'🎫 <em>복권방 오픈</em> — 박규동 / 복도<br><br>• 1장 <em>100G</em><br>• 트럼프카드 52장 중 <em>6개 맞추기</em><br>• 매 라운드 끝나고 결과 발표<br><br>2개: 0배 / 3개: <em>25배</em> / 4개: <em>325배</em><br>5개: <em>2,000배</em> / 6개: <em>50,000배</em>'},
+// ── 6R 플레이어 출마 (9:30~10:00) ──
+{r:'6R — 플레이어 출마',ri:7,sp:'시스템',c:'sys',h:'📢 <em>세대교체</em><br><br>기존 정당이 <em>전부 해산</em>됩니다.<br>NPC 대통령의 정책이 종료됩니다.'},
+{r:'6R — 플레이어 출마',ri:7,sp:'시스템',c:'sys',h:'📢 <em>플레이어 대통령 출마 가능</em><br><br>누구든 대통령에 도전할 수 있습니다.'},
+{r:'6R — 플레이어 출마',ri:7,sp:'시스템',c:'sys',h:'📌 <em>플레이어 대통령 권한</em><br><br>• 주식: <em>오를 것 2개 + 내릴 것 2개</em> 즉시 선택<br>• 도박: 종목 변경 + 보상률 조정<br>• 경마: 아이템 가격 조정<br>• 복권: 배수 조정<br>• 플레이어 <em>은행 자금 현황 열람</em><br><br>⚠️ 경제활동 전면 금지 · 강도 불가 · 월급 없음'},
+{r:'6R — 플레이어 출마',ri:7,sp:'시스템',c:'sys',h:'투표 진행',m:'→ 투표'},
+// ── 7R 강도 시스템 (10:00~10:30) ──
+{r:'7R — 강도 오픈',ri:8,sp:'시스템',c:'sys',h:'📊 <em>플레이어 평균 자산 공개</em>',m:'→ 순위표 표시'},
+{r:'7R — 강도 오픈',ri:8,sp:'시스템',c:'sys',h:'🔫 <em>강도 시스템 오픈</em><br><br>은행 예금을 노릴 수 있습니다.<br><span class="rub">대통령은 강도 불가 · 지목은 당할 수 있음</span>'},
+{r:'7R — 강도 오픈',ri:8,sp:'시스템',c:'sys',h:'📌 <em>강도 규칙</em><br><br>1. 은행에서 대상 지정 → 예금 전부를 노림<br>2. 나 제외 <em>n명</em>을 용의선상에 추가 (위장)<br>3. 피해자는 <em>m번</em> 기회 안에 범인 찍기<br>4. 맞추면 돈 지킴 · 못 맞추면 뺏김<br><br>강도 비용: <em>(n-m)/n × 예금액</em> 이상<br>부족하면 은행에 회수 (돈 날림)'},
+// ── 8R 마지막 라운드 (10:30~11:00) ──
+{r:'8R — 마지막 라운드',ri:9,sp:'시스템',c:'sys',h:'⚠️ <em>마지막 라운드</em><br><br>이것이 마지막 기회입니다.'},
+{r:'8R — 마지막 라운드',ri:9,sp:'시스템',c:'sys',h:'😇 <em>엔젤 진출</em>: 순자산 <em>2,000G (10만 루블) 이상</em><br>😈 <em>데블 진출</em>: 순자산 <em>마이너스</em>',m:'→ 밸런스 조정 공지'},
+{r:'8R — 마지막 라운드',ri:9,sp:'시스템',c:'sys',h:'재분배 방식은 <em>현 대통령이 결정</em>합니다.'},
+// ── 9R 엔딩 (11:00~) ──
+{r:'9R — 엔딩',ri:10,sp:'내레이션',c:'narr',h:'모든 시장이 닫힙니다.<br>모든 주식이 현금화됩니다.<br>모든 빚이 정산됩니다.'},
+{r:'9R — 엔딩',ri:10,sp:'시스템',c:'sys',h:'1. 주식 <em>강제 매도</em><br>2. 대출 <em>강제 상환</em><br>3. <em>순자산 = 골드 - 빚</em>'},
+{r:'9R — 엔딩',ri:10,sp:'',c:'vip',h:'😇 <em>엔젤</em> — 2,000G 이상<br><br>데블 퀴즈쇼를 관전하면서<br><em>누가 맞출지 베팅</em>하여 최종 순위 결정'},
+{r:'9R — 엔딩',ri:10,sp:'',c:'squid',h:'😈 <em>데블</em> — 순자산 마이너스<br><br>다양한 <em>퀴즈쇼 서바이벌</em><br>맞추면 빚 감면 · 1등이 꼴등에게 빚 떠넘기기<br><em>빚 전액 감면 = 탈출</em> · <em>마이너스 한도 도달 = 사망</em>'},
+{r:'9R — 엔딩',ri:10,sp:'내레이션',c:'narr',h:'최종 승자는…<br><br><em>당신은 어떤 방법으로 여기까지 왔습니까?</em>'},
+];
+
+const ROUNDS=['몸풀기 퀴즈','카톡 투표','0R+1R 프롤로그+선거','2R 주식','3R 경마','4R 대출+도박','5R 복권','6R 출마','7R 강도','8R 마지막','9R 엔딩'];
+
+// ═══════════════════════════════════════════
+// [3] BROADCAST
+// ═══════════════════════════════════════════
+const ch=new BroadcastChannel('fantasy-republic');
+let presentMode='script';
+function openPresent(){window.open('present.html','present','width=1280,height=720');document.getElementById('presentBtn').textContent='열림';document.getElementById('presentBtn').classList.add('on')}
+function sendBlack(){ch.postMessage({type:'black'});document.getElementById('previewBox').innerHTML='<span style="color:#333">화면 꺼짐</span>'}
+
+// ═══════════════════════════════════════════
+// QUIZ (몸풀기)
+// ═══════════════════════════════════════════
+let quizData = [];
+function addQuizEntry(){
+  const idx = quizData.length;
+  quizData.push({name:'', val:''});
+  renderQuiz();
+}
+function renderQuiz(){
+  const c = document.getElementById('quizEntries');
+  c.innerHTML = quizData.map((q,i)=>`
+    <div class="form-row" style="margin:4px 0">
+      <input type="text" placeholder="이름" value="${q.name}" oninput="quizData[${i}].name=this.value" style="width:120px;flex:none">
+      <input type="number" placeholder="0~100" min="0" max="100" value="${q.val}" oninput="quizData[${i}].val=this.value" style="width:80px;flex:none">
+      <button class="btn" onclick="quizData.splice(${i},1);renderQuiz()">✕</button>
+    </div>`).join('');
+}
+function calcQuiz(){
+  const entries = quizData.filter(q=>q.name && q.val!=='');
+  if(entries.length < 2){alert('2명 이상 필요합니다.');return;}
+  const vals = entries.map(q=>+q.val);
+  const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const target = avg * 0.5;
+  let best = null, bestDist = Infinity;
+  entries.forEach(q=>{
+    const d = Math.abs(+q.val - target);
+    if(d < bestDist){bestDist=d; best=q;}
+  });
+  const el = document.getElementById('quizResult');
+  el.textContent = `평균 ${avg.toFixed(1)} → 목표 ${target.toFixed(1)} | 🏆 ${best.name} (${best.val}) 승리!`;
+  sendQuizResult(best.name, avg, target);
+}
+function sendQuizScreen(){
+  ch.postMessage({type:'quiz', phase:'input'});
+}
+function sendQuizResult(winner, avg, target){
+  ch.postMessage({type:'quiz', phase:'result', winner, avg: avg.toFixed(1), target: target.toFixed(1)});
+}
+
+// Poll (7:00 카톡 투표)
+let pollData = [];
+function addPollEntry(){
+  pollData.push({name:'', val:''});
+  renderPoll();
+}
+function renderPoll(){
+  const c = document.getElementById('pollEntries');
+  c.innerHTML = pollData.map((q,i)=>`
+    <div class="form-row" style="margin:4px 0">
+      <input type="text" placeholder="이름" value="${q.name}" oninput="pollData[${i}].name=this.value;updatePollLive()" style="width:120px;flex:none">
+      <input type="number" placeholder="0~100" min="0" max="100" value="${q.val}" oninput="pollData[${i}].val=this.value;updatePollLive()" style="width:80px;flex:none">
+      <button class="btn" onclick="pollData.splice(${i},1);renderPoll();updatePollLive()">✕</button>
+    </div>`).join('');
+  updatePollLive();
+}
+function updatePollLive(){
+  const entries = pollData.filter(q=>q.val!=='');
+  const live = document.getElementById('pollLive');
+  if(entries.length < 1){live.textContent='입력 대기 중...';return;}
+  const vals = entries.map(q=>+q.val);
+  const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const target = avg * 0.5;
+  live.innerHTML = `<span style="color:#888">참여 ${entries.length}명</span> &nbsp;|&nbsp; 현재 평균: <b style="color:#f0c040">${avg.toFixed(1)}</b> &nbsp;→&nbsp; 목표값: <b style="color:#ff6b6b">${target.toFixed(1)}</b>`;
+}
+function calcPoll(){
+  const entries = pollData.filter(q=>q.name && q.val!=='');
+  if(entries.length < 2){alert('2명 이상 필요합니다.');return;}
+  const vals = entries.map(q=>+q.val);
+  const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const target = avg * 0.5;
+  const dists = entries.map(q=>({...q, d: Math.abs(+q.val - target)}));
+  const minD = Math.min(...dists.map(q=>q.d));
+  const winners = dists.filter(q=>q.d===minD);
+  const names = winners.map(q=>`${q.name}(${q.val})`).join(', ');
+  document.getElementById('pollResult').textContent = `목표 ${target.toFixed(1)} | 🏆 ${names} 승리!`;
+  ch.postMessage({type:'quiz', phase:'result', winner: winners.map(q=>q.name).join(' · '), avg: avg.toFixed(1), target: target.toFixed(1)});
+}
+function sendScheduleToPresent(){
+  ch.postMessage({type:'schedule'});
+}
+function setMode(m){presentMode=m;document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));if(m==='scoreboard')sendScoreboard();if(m==='stocks')sendStocks();if(m==='timer')sendTimerToPresent();}
+
+// ═══════════════════════════════════════════
+// [4] TAB SYSTEM
+// ═══════════════════════════════════════════
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById(t.dataset.tab).classList.add('active');
+  refreshDropdowns();
+});
+
+// ═══════════════════════════════════════════
+// [5] SCRIPT / CUE
+// ═══════════════════════════════════════════
+let curCue=0;
+function buildCues(){
+  const rt=document.getElementById('rtabs');
+  rt.innerHTML=ROUNDS.map((n,i)=>`<button class="rtab${i===0?' active':''}" onclick="jumpRound(${i})">${n}</button>`).join('');
+  const cl=document.getElementById('cueList');
+  let lastRi=-1;
+  cl.innerHTML=SCRIPT.map((q,i)=>{
+    let sep='';
+    if(q.ri!==lastRi){sep=`<div style="margin:16px 0 8px;padding:6px 12px;background:linear-gradient(90deg,rgba(240,192,64,0.15),transparent);border-left:3px solid #f0c040;font-size:13px;font-weight:900;color:#f0c040;border-radius:0 6px 6px 0">${q.r}</div>`;lastRi=q.ri;}
+    return sep+`<div class="cue" data-i="${i}"><div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#f0c040;font-weight:900;font-size:11px;margin-right:8px;min-width:20px">#${i+1}</span><div class="cue-sp ${q.c}" style="flex:1;cursor:pointer" onclick="goCue(${i})">${q.sp||'(없음)'}</div><button class="btn" style="font-size:9px;padding:2px 6px" onclick="event.stopPropagation();editCue(${i})">✏️</button></div><div class="cue-pv" style="cursor:pointer" onclick="goCue(${i})">${q.h.replace(/<[^>]+>/g,' ').substring(0,70)}…</div>${q.m?'<div class="cue-memo">'+q.m+'</div>':''}</div>`;
+  }).join('');
+}
+function editCue(i){
+  const q=SCRIPT[i];
+  const el=document.querySelectorAll('.cue')[i];
+  el.innerHTML=`<div style="margin-bottom:6px">
+      <label style="font-size:10px;color:#666">화자</label>
+      <input type="text" id="editSp_${i}" value="${q.sp||''}" placeholder="비우면 프레젠테이션에 안 뜸" style="width:100%;margin-top:2px">
+    </div>
+    <div>
+      <label style="font-size:10px;color:#666">내용 (HTML)</label>
+      <textarea id="editH_${i}" style="width:100%;min-height:100px;background:#0a0a0f;border:1px solid #f0c040;color:#eee;font-size:12px;font-family:inherit;padding:6px;border-radius:4px;resize:vertical">${q.h}</textarea>
+    </div>
+    <div style="margin-top:2px;font-size:10px;color:#333">미리보기:</div>
+    <div class="preview-box" style="max-height:150px;margin:4px 0 6px" id="editPv_${i}">${q.h}</div>
+    <div style="display:flex;gap:4px">
+      <button class="btn" onclick="saveCue(${i})" style="font-size:10px;border-color:#f0c040;color:#f0c040">저장 + 프레젠테이션 반영</button>
+      <button class="btn" onclick="buildCues()" style="font-size:10px">취소</button>
+    </div>`;
+  document.getElementById('editH_'+i).addEventListener('input',function(){
+    document.getElementById('editPv_'+i).innerHTML=this.value;
+  });
+}
+function saveCue(i){
+  SCRIPT[i].h=document.getElementById('editH_'+i).value;
+  SCRIPT[i].sp=document.getElementById('editSp_'+i).value;
+  saveScriptEdits();
+  buildCues();
+  goCue(i);
+}
+function saveScriptEdits(){
+  const edits={};
+  SCRIPT.forEach((q,i)=>{ edits[i]={h:q.h, sp:q.sp}; });
+  localStorage.setItem('fr-script-edits',JSON.stringify(edits));
+}
+function loadScriptEdits(){
+  const raw=localStorage.getItem('fr-script-edits');
+  if(!raw)return;
+  try{
+    const edits=JSON.parse(raw);
+    Object.keys(edits).forEach(i=>{
+      if(SCRIPT[i]){
+        SCRIPT[i].h=edits[i].h;
+        if(edits[i].sp!==undefined) SCRIPT[i].sp=edits[i].sp;
+      }
+    });
+  }catch(e){}
+}
+loadScriptEdits();
+function goCue(i){
+  if(i<0||i>=SCRIPT.length)return;
+  const cues=document.querySelectorAll('.cue');
+  cues.forEach((c,idx)=>{c.classList.remove('active-cue');c.classList.toggle('sent',idx<i)});
+  curCue=i;cues[i].classList.add('active-cue');cues[i].scrollIntoView({behavior:'smooth',block:'center'});
+  const q=SCRIPT[i];
+  document.querySelectorAll('.rtab').forEach((t,idx)=>t.classList.toggle('active',idx===q.ri));
+  if(q.ri>=4){const bl=document.getElementById('betLock');if(bl)bl.style.display='none';const bc=document.getElementById('betContent');if(bc)bc.style.display='block';}
+  if(presentMode==='script'){
+    if(q._action==='quiz'){ch.postMessage({type:'quiz',phase:'input'});}
+    else if(q._action==='kakao'){ch.postMessage({type:'kakao'});}
+    else if(q.c==='dir'){/* 연출은 프레젠테이션에 안 보냄 */}
+    else{ch.postMessage({type:'show',data:{round:q.r,speaker:q.sp,speakerClass:q.c,html:q.h,progress:((i+1)/SCRIPT.length)*100}});}
+    document.getElementById('previewBox').innerHTML=q.h;
+  }
+  document.getElementById('posInd').textContent=(i+1)+' / '+SCRIPT.length;
+  document.getElementById('prevBtn').disabled=i===0;
+  document.getElementById('nextBtn').disabled=i===SCRIPT.length-1;
+}
+function jumpRound(ri){const i=SCRIPT.findIndex(s=>s.ri===ri);if(i>=0)goCue(i)}
+
+// ═══════════════════════════════════════════
+// [6] PLAYERS
+// ═══════════════════════════════════════════
+function netWorth(p){let sv=0;for(const[co,q] of Object.entries(p.stocks||{}))sv+=(ST.stocks[co]?.price||0)*q;return p.gold+sv-p.debt}
+function addPlayer(){const n=document.getElementById('pName').value.trim();if(!n)return;const pa=document.getElementById('pParty').value;ST.players.push({id:Date.now(),name:n,gold:0,stocks:{},debt:0,party:pa});document.getElementById('pName').value='';save();renderPlayers()}
+function bulkGold(amt){ST.players.forEach(p=>p.gold+=amt);save();renderPlayers();addBankLog('전원 '+amt+'G 지급')}
+function bulkTax(){if(ST.president!=='junhyuk')return alert('카르벤(박준혁) 정책만 해당');ST.players.forEach(p=>{const tax=p.party==='강철방위당'?30:50;p.gold-=tax});save();renderPlayers();addBankLog('국방세 징수 (당원30G/일반50G)')}
+function bulkBonus(){const sorted=[...ST.players].sort((a,b)=>netWorth(b)-netWorth(a));if(sorted.length){sorted[0].gold+=100;save();renderPlayers();addBankLog(sorted[0].name+' 1위 보너스 100G')}}
+function bulkInterest(){ST.players.forEach(p=>{if(p.debt>0){const i=Math.ceil(p.debt*0.1/10)*10;p.debt+=i}});save();renderPlayers();addBankLog('이자 10% 일괄 적용')}
+function bulkRedistribute(){if(ST.president!=='yeonwoo')return alert('장연우 정책만 해당');const sorted=[...ST.players].sort((a,b)=>netWorth(b)-netWorth(a));if(!sorted.length)return;const top=sorted[0];const take=Math.floor(netWorth(top)*0.1/10)*10;top.gold-=take;const share=Math.floor(take/ST.players.length/10)*10;ST.players.forEach(p=>{const mult=(p.party==='암흑이익당')?2:1;p.gold+=share*mult});save();renderPlayers();addBankLog('재분배: '+top.name+'에서 '+take+'G 회수 → 1인 '+share+'G')}
+
+function renderPlayers(){
+  const sorted=[...ST.players].sort((a,b)=>netWorth(b)-netWorth(a));
+  const tb=document.getElementById('playerTable');
+  tb.innerHTML=sorted.map((p,i)=>{
+    const nw=netWorth(p);const sv=Object.entries(p.stocks||{}).reduce((s,[co,q])=>s+(ST.stocks[co]?.price||0)*q,0);
+    const pc=p.party==='강철방위당'?'party-j':p.party==='혁신개발당'?'party-s':p.party==='암흑이익당'?'party-y':'';
+    return `<tr><td>${i+1}</td><td>${p.name}</td><td class="${pc}">${p.party||'무소속'}</td><td class="r gold">${p.gold.toLocaleString()}</td><td class="r">${sv.toLocaleString()}</td><td class="r${p.debt>0?' neg':''}">${p.debt>0?'-'+p.debt.toLocaleString():0}</td><td class="r${nw<0?' neg':''}" style="font-weight:900">${nw.toLocaleString()}</td><td><button class="btn" onclick="editPlayer(${p.id})">수정</button> <button class="btn" onclick="removePlayer(${p.id})">삭제</button></td></tr>`}).join('');
+  renderMiniSb(sorted);
+}
+function editPlayer(id){const p=ST.players.find(x=>x.id===id);if(!p)return;const g=prompt(p.name+' 골드 직접 설정:',p.gold);if(g!==null){p.gold=parseInt(g)||0;save();renderPlayers()}}
+function removePlayer(id){if(!confirm('정말 삭제?'))return;ST.players=ST.players.filter(x=>x.id!==id);save();renderPlayers()}
+function renderMiniSb(sorted){
+  if(!sorted)sorted=[...ST.players].sort((a,b)=>netWorth(b)-netWorth(a));
+  document.getElementById('miniSb').innerHTML=sorted.slice(0,8).map((p,i)=>{const nw=netWorth(p);return `<div class="mini-sb-row"><span class="mini-sb-rank">${i+1}</span><span class="mini-sb-name">${p.name}</span><span class="mini-sb-gold${nw<0?' neg':''}">${nw.toLocaleString()}G</span></div>`}).join('');
+}
+
+// ═══════════════════════════════════════════
+// [7] BANK
+// ═══════════════════════════════════════════
+function addBankLog(msg){ST.bankLog.unshift('[R'+ST.round+'] '+msg);if(ST.bankLog.length>100)ST.bankLog.pop();save();document.getElementById('bankLog').innerHTML=ST.bankLog.map(l=>'<div class="log-entry">'+l+'</div>').join('')}
+function updateLoanMax(){const p=getSelPlayer('loanPlayer');document.getElementById('loanMax').textContent=p?Math.max(0,Math.floor(netWorth(p)*0.5/100)*100)+'G':'—'}
+function updateRepayInfo(){const p=getSelPlayer('repayPlayer');document.getElementById('repayDebt').textContent=p?p.debt+'G':'—'}
+function doLoan(){const p=getSelPlayer('loanPlayer');if(!p)return;const amt=parseInt(document.getElementById('loanAmt').value)||0;if(amt<=0||amt%100!==0)return alert('100G 단위');const max=Math.floor(netWorth(p)*0.5/100)*100;if(amt>max)return alert('한도 초과: '+max+'G');p.gold+=amt;p.debt+=amt;save();renderPlayers();addBankLog(p.name+' 대출 '+amt+'G')}
+function doRepay(){const p=getSelPlayer('repayPlayer');if(!p)return;const amt=parseInt(document.getElementById('repayAmt').value)||0;if(amt<=0)return;const actual=Math.min(amt,p.debt,p.gold);p.gold-=actual;p.debt-=actual;save();renderPlayers();addBankLog(p.name+' 상환 '+actual+'G')}
+function doTransfer(){const from=getSelPlayer('txFrom'),to=getSelPlayer('txTo');if(!from||!to||from.id===to.id)return alert('다른 플레이어 선택');const amt=parseInt(document.getElementById('txAmt').value)||0;if(amt<=0||amt%100!==0)return alert('100G 단위');const feeExempt=from.party==='암흑이익당';const fee=feeExempt?0:Math.max(10,Math.ceil(amt*0.05/10)*10);if(from.gold<amt+fee)return alert('골드 부족');from.gold-=amt+fee;to.gold+=amt;save();renderPlayers();addBankLog(from.name+'→'+to.name+' '+amt+'G (수수료'+fee+'G)')}
+
+// ═══════════════════════════════════════════
+// [8] STOCKS
+// ═══════════════════════════════════════════
+const STOCK_NAMES=Object.keys(ST.stocks);
+const SECTORS={construction:'건설',military:'군수',tech:'기술',energy:'에너지',entertainment:'엔터',blackmarket:'암시장'};
+const BOOST={junhyuk:['construction','military'],sangrin:['tech','energy'],yeonwoo:['entertainment','blackmarket']};
+const NERF={junhyuk:['entertainment','blackmarket'],yeonwoo:['construction']};
+
+function renderStocks(){
+  const tb=document.getElementById('stockTable');
+  tb.innerHTML=STOCK_NAMES.map(n=>{
+    const s=ST.stocks[n];const id='chg_'+n.replace(/\s/g,'');
+    const curChg=parseInt(document.getElementById(id)?.value)||0;
+    let boost=0;
+    if(ST.president&&BOOST[ST.president]?.includes(s.sector))boost=Math.round(s.price*0.2/10)*10;
+    if(ST.president&&NERF[ST.president]?.includes(s.sector))boost=-Math.round(s.price*0.1/10)*10;
+    const newP=Math.max(0,s.price+curChg+boost);
+    return `<tr><td>${n} (${SECTORS[s.sector]})</td><td class="r">${s.price}G</td><td class="r"><input type="number" id="${id}" value="${curChg}" step="10" style="width:70px" onchange="renderStocks()"></td><td class="r" style="color:${boost>0?'#6aff9a':boost<0?'#ff6b6b':'#555'}">${boost>0?'+':''}${boost}</td><td class="r gold">${newP}G</td></tr>`}).join('');
+}
+function applyStockChanges(){
+  STOCK_NAMES.forEach(n=>{
+    const s=ST.stocks[n];const id='chg_'+n.replace(/\s/g,'');
+    const chg=parseInt(document.getElementById(id)?.value)||0;
+    let boost=0;
+    if(ST.president&&BOOST[ST.president]?.includes(s.sector))boost=Math.round(s.price*0.2/10)*10;
+    if(ST.president&&NERF[ST.president]?.includes(s.sector))boost=-Math.round(s.price*0.1/10)*10;
+    s.price=Math.max(10,s.price+chg+boost);
+    s.history.push(s.price);
+    document.getElementById(id).value=0;
+  });
+  save();renderStocks();renderPlayers();addBankLog('주가 변동 적용');
+}
+function doTrade(type){
+  const p=getSelPlayer('tradePlayer');if(!p)return;
+  const co=document.getElementById('tradeCo').value;if(!co)return;
+  const qty=parseInt(document.getElementById('tradeQty').value)||1;
+  const price=ST.stocks[co].price;
+  if(type==='buy'){const cost=price*qty+10;if(p.gold<cost)return alert('골드 부족 ('+cost+'G 필요)');p.gold-=cost;p.stocks[co]=(p.stocks[co]||0)+qty;addBankLog(p.name+' '+co+' '+qty+'주 매수 ('+cost+'G)')}
+  else{if((p.stocks[co]||0)<qty)return alert('보유 부족');p.stocks[co]-=qty;if(p.stocks[co]===0)delete p.stocks[co];p.gold+=price*qty;addBankLog(p.name+' '+co+' '+qty+'주 매도 ('+(price*qty)+'G)')}
+  save();renderPlayers();
+}
+function sendStocks(){
+  ch.postMessage({type:'stocks',data:{stocks:STOCK_NAMES.map(n=>({name:n,price:ST.stocks[n].price,history:ST.stocks[n].history}))}});
+  document.getElementById('previewBox').innerHTML='주가 화면 표시 중';
+}
+
+// ═══════════════════════════════════════════
+// [9] VOTE
+// ═══════════════════════════════════════════
+function addVote(k){ST.votes[k]++;save();renderVote()}
+function resetVotes(){ST.votes={junhyuk:0,sangrin:0,yeonwoo:0,abstain:0};save();renderVote()}
+function addImpeach(k){ST.impeachment[k]++;save();renderVote()}
+function renderVote(){
+  const t=ST.votes.junhyuk+ST.votes.sangrin+ST.votes.yeonwoo+ST.votes.abstain||1;
+  const vd=document.getElementById('voteDisplay');
+  vd.innerHTML=[['⚔️ 박준혁',ST.votes.junhyuk,'#6ab0ff'],['🧪 정상린',ST.votes.sangrin,'#6aff9a'],['🕷️ 장연우',ST.votes.yeonwoo,'#d06aff'],['기권',ST.votes.abstain,'#555']].map(([n,c,col])=>`<div class="form-row" style="margin:4px 0"><span style="width:80px;font-size:12px">${n}</span><div class="vote-bar-o"><div class="vote-bar-i" style="width:${c/t*100}%;background:${col}"></div></div><span style="width:40px;text-align:right;font-weight:700">${c}</span></div>`).join('');
+  const it=ST.impeachment.keep+ST.impeachment.remove||1;
+  document.getElementById('impeachDisplay').innerHTML=[['유지',ST.impeachment.keep,'#6aff9a'],['탄핵',ST.impeachment.remove,'#ff4444']].map(([n,c,col])=>`<div class="form-row" style="margin:4px 0"><span style="width:60px;font-size:12px">${n}</span><div class="vote-bar-o"><div class="vote-bar-i" style="width:${c/it*100}%;background:${col}"></div></div><span style="width:40px;text-align:right;font-weight:700">${c}</span></div>`).join('');
+}
+function sendVoteElection(){
+  ch.postMessage({type:'vote',data:{title:'초대 대통령 선거',candidates:[{name:'박준혁',count:ST.votes.junhyuk},{name:'정상린',count:ST.votes.sangrin},{name:'장연우',count:ST.votes.yeonwoo},{name:'기권',count:ST.votes.abstain}]}});
+}
+function sendVoteImpeach(){
+  ch.postMessage({type:'vote',data:{title:'탄핵 투표',candidates:[{name:'유지',count:ST.impeachment.keep},{name:'탄핵',count:ST.impeachment.remove}]}});
+}
+
+// ═══════════════════════════════════════════
+// [10] BETTING
+// ═══════════════════════════════════════════
+function addBetLog(msg){ST.betLog.unshift(msg);if(ST.betLog.length>50)ST.betLog.pop();save();document.getElementById('betLog').innerHTML=ST.betLog.map(l=>'<div class="log-entry">'+l+'</div>').join('')}
+function placeHorseBet(){const p=getSelPlayer('hrPlayer');if(!p)return;const h=parseInt(document.getElementById('hrHorse').value);const amt=parseInt(document.getElementById('hrAmt').value)||100;if(p.gold<amt)return alert('골드 부족');p.gold-=amt;ST.horseBets.push({pid:p.id,name:p.name,horse:h,amt});save();renderPlayers();renderHorseBets();addBetLog(p.name+' 경마 '+h+'번말 '+amt+'G')}
+function renderHorseBets(){document.getElementById('horseBets').innerHTML=ST.horseBets.map(b=>`<div style="font-size:11px;color:#888">${b.name}: ${b.horse}번말 ${b.amt}G</div>`).join('')}
+function settleHorse(){const w=parseInt(document.getElementById('hrWinner').value);ST.horseWinner=w;const mult=[0,2,3,5,10];ST.horseBets.forEach(b=>{const p=ST.players.find(x=>x.id===b.pid);if(!p)return;if(b.horse===w){p.gold+=b.amt*mult[w];addBetLog('🏇 '+b.name+' 당첨! +'+(b.amt*mult[w])+'G')}else{addBetLog('🏇 '+b.name+' 낙첨')}});ST.horseBets=[];save();renderPlayers();renderHorseBets()}
+function sendHorse(){ch.postMessage({type:'horse',data:{winner:ST.horseWinner||1}})}
+function settleGamble(){const p=getSelPlayer('gePlayer');if(!p)return;const choice=document.getElementById('geChoice').value;const result=document.getElementById('geResult').value;const amt=parseInt(document.getElementById('geAmt').value)||100;if(choice===result){p.gold+=amt;addBetLog('🎰 '+p.name+' 적중! +'+amt+'G')}else{p.gold-=amt;addBetLog('🎰 '+p.name+' 실패 -'+amt+'G')}save();renderPlayers()}
+function drawLottery(){const p=getSelPlayer('lotPlayer');if(!p)return;if(p.gold<50)return alert('골드 부족');p.gold-=50;const r=Math.random();let prize=0,label='❌ 꽝';if(r<0.05){prize=500;label='🥇 1등! 500G'}else if(r<0.20){prize=200;label='🥈 2등! 200G'}else if(r<0.50){prize=100;label='🥉 3등! 100G'}p.gold+=prize;save();renderPlayers();document.getElementById('lotResult').innerHTML=`<span style="color:${prize>0?'#f0c040':'#ff4444'}">${p.name}: ${label}</span>`;addBetLog('🎟️ '+p.name+' 복권 → '+label)}
+
+// ═══════════════════════════════════════════
+// [11] TIMER
+// ═══════════════════════════════════════════
+let timerSec=300,timerInt=null;
+function updateTimer(){const m=Math.floor(timerSec/60),s=timerSec%60;const txt=m+':'+String(s).padStart(2,'0');const el=document.getElementById('timerDisp');el.textContent=txt;el.classList.toggle('urgent',timerSec<=10);if(presentMode==='timer')sendTimerToPresent()}
+function sendTimerToPresent(){ch.postMessage({type:'timer',data:{seconds:timerSec,running:!!timerInt}})}
+function startTimer(sec){stopTimer();timerSec=sec;updateTimer();timerInt=setInterval(()=>{timerSec--;updateTimer();if(timerSec<=0)stopTimer()},1000)}
+function stopTimer(){if(timerInt){clearInterval(timerInt);timerInt=null}}
+
+// ═══════════════════════════════════════════
+// [12] SCOREBOARD
+// ═══════════════════════════════════════════
+function sendScoreboard(){
+  const sorted=[...ST.players].sort((a,b)=>netWorth(b)-netWorth(a));
+  ch.postMessage({type:'scoreboard',data:{players:sorted.map(p=>({name:p.name,netWorth:netWorth(p),party:p.party||''}))}});
+  document.getElementById('previewBox').innerHTML='순위표 표시 중';
+}
+
+// ═══════════════════════════════════════════
+// [13] HELPERS
+// ═══════════════════════════════════════════
+function getSelPlayer(selId){const sel=document.getElementById(selId);const id=parseInt(sel?.value);return ST.players.find(p=>p.id===id)}
+function refreshDropdowns(){
+  ['loanPlayer','repayPlayer','txFrom','txTo','tradePlayer','hrPlayer','gePlayer','lotPlayer'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;
+    el.innerHTML=ST.players.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+    if(cur)el.value=cur;
+  });
+  const tco=document.getElementById('tradeCo');
+  if(tco)tco.innerHTML=STOCK_NAMES.map(n=>`<option value="${n}">${n}</option>`).join('');
+  if(document.getElementById('presidentSel'))document.getElementById('presidentSel').value=ST.president||'';
+}
+
+// ═══════════════════════════════════════════
+// [14] KEYBOARD
+// ═══════════════════════════════════════════
+// 키보드 조작은 프레젠테이션 창에서만 작동
+ch.onmessage=(e)=>{
+  if(e.data.type==='key'){
+    if(e.data.key==='next')goCue(curCue+1);
+    if(e.data.key==='prev')goCue(curCue-1);
+    if(e.data.key==='black')sendBlack();
+  }
+};
+
+// ═══════════════════════════════════════════
+// [15] INIT
+// ═══════════════════════════════════════════
+load();
+buildCues();
+renderPlayers();
+renderStocks();
+renderVote();
+renderHorseBets();
+refreshDropdowns();
+updateTimer();
+document.getElementById('bankLog').innerHTML=ST.bankLog.map(l=>'<div class="log-entry">'+l+'</div>').join('');
+document.getElementById('betLog').innerHTML=ST.betLog.map(l=>'<div class="log-entry">'+l+'</div>').join('');
+</script>
+</body>
+</html>
